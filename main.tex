@@ -1,0 +1,1379 @@
+
+%%%%%%%% ICML 2025 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+% Recommended, but optional, packages for figures and better typesetting:
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs} % for professional tables
+
+% hyperref makes hyperlinks in the resulting PDF.
+% If your build breaks (sometimes temporarily if a hyperlink spans a page)
+% please comment out the following usepackage line and replace
+% \usepackage{icml2025} with \usepackage[nohyperref]{icml2025} above.
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{hyperref}
+
+
+% Attempt to make hyperref and algorithmic work together better:
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+% Use the following line for the initial blind version submitted for review:
+% \usepackage{icml2025}
+
+% If accepted, instead use the following line for the camera-ready submission:
+\usepackage[accepted]{icml2025}
+
+% For theorems and such
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+
+\usepackage{multirow}
+
+
+% if you use cleveref..
+\usepackage[capitalize,noabbrev]{cleveref}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\usepackage{graphicx}
+
+% Todonotes is useful during development; simply uncomment the next line
+%    and comment out the line below the next line to turn off comments
+%\usepackage[disable,textsize=tiny]{todonotes}
+\usepackage[textsize=tiny]{todonotes}
+
+
+% The \icmltitle you define below is probably too long as a header.
+% Therefore, a short form for the running title is supplied here:
+\icmltitlerunning{Automatically Identify and Rectify: Robust Deep Contrastive Multi-view Clustering in Noisy Scenarios}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{Automatically Identify and Rectify: Robust Deep Contrastive \\ Multi-view Clustering in Noisy Scenarios}
+
+
+
+% It is OKAY to include author information, even for blind
+% submissions: the style file will automatically remove it for you
+% unless you've provided the [accepted] option to the icml2025
+% package.
+
+% List of affiliations: The first argument should be a (short)
+% identifier you will use later to specify author affiliations
+% Academic affiliations should list Department, University, City, Region, Country
+% Industry affiliations should list Company, City, Region, Country
+
+% You can specify symbols, otherwise they are numbered in order.
+% Ideally, you should not use this facility. Affiliations will be numbered
+% in order of appearance and this is the preferred way.
+\icmlsetsymbol{equal}{*}
+
+\begin{icmlauthorlist}
+\icmlauthor{Xihong Yang}{1,2}
+\icmlauthor{Siwei Wang}{3}
+\icmlauthor{Fangdi Wang}{1}
+\icmlauthor{Jiaqi Jin}{1} \\
+\icmlauthor{Suyuan Liu}{1}
+\icmlauthor{Yue Liu}{2}
+\icmlauthor{En Zhu}{1}
+\icmlauthor{Xinwang Liu}{1}
+\icmlauthor{Yueming Jin}{2}
+% \icmlauthor{Firstname2 Lastname2}{equal,yyy,comp}
+% \icmlauthor{Firstname3 Lastname3}{comp}
+% \icmlauthor{Firstname4 Lastname4}{sch}
+% \icmlauthor{Firstname5 Lastname5}{yyy}
+% \icmlauthor{Firstname6 Lastname6}{sch,yyy,comp}
+% \icmlauthor{Firstname7 Lastname7}{comp}
+%\icmlauthor{}{sch}
+% \icmlauthor{Firstname8 Lastname8}{sch}
+% \icmlauthor{Firstname8 Lastname8}{yyy,comp}
+%\icmlauthor{}{sch}
+%\icmlauthor{}{sch}
+\end{icmlauthorlist}
+
+\icmlaffiliation{1}{School of Computer, National University of Defense Technology, Changsha, Hunan, China}
+\icmlaffiliation{2}{National University of Singapore, Singapore.}
+\icmlaffiliation{3}{Intelligent Game and Decision Lab, Beijing, China, xihong\_edu@163.com}
+
+\icmlcorrespondingauthor{Xinwang Liu}
+{xinwangliu@nudt.edu.cn}
+% \icmlcorrespondingauthor{Firstname2 Lastname2}{first2.last2@www.uk}
+
+% You may provide any keywords that you
+% find helpful for describing your paper; these are used to populate
+% the "keywords" metadata in the PDF but will not be shown in the document
+\icmlkeywords{Machine Learning, ICML}
+
+\vskip 0.3in
+]
+
+% this must go after the closing bracket ] following \twocolumn[ ...
+
+% This command actually creates the footnote in the first column
+% listing the affiliations and the copyright notice.
+% The command takes one argument, which is text to display at the start of the footnote.
+% The \icmlEqualContribution command is standard text for equal contribution.
+% Remove it (just {}) if you do not need this facility.
+
+\printAffiliationsAndNotice{}  % leave blank if no need to mention equal contribution
+% \printAffiliationsAndNotice{\icmlEqualContribution} % otherwise use the standard text.
+
+\begin{abstract}
+
+
+Leveraging the powerful representation learning capabilities, deep multi-view clustering methods have demonstrated reliable performance by effectively integrating multi-source information from diverse views in recent years. Most existing methods rely on the assumption of clean views. However, noise is pervasive in real-world scenarios, leading to a significant degradation in performance. To tackle this problem, we propose a novel multi-view clustering framework for the automatic identification and rectification of noisy data, termed AIRMVC. Specifically, we reformulate noisy identification as an anomaly identification problem using GMM. We then design a hybrid rectification strategy to mitigate the adverse effects of noisy data based on the identification results. Furthermore, we introduce a noise-robust contrastive mechanism to generate reliable representations. Additionally, we provide a theoretical proof demonstrating that these representations can discard noisy information, thereby improving the performance of downstream tasks. Extensive experiments on six benchmark datasets demonstrate that AIRMVC outperforms state-of-the-art algorithms in terms of robustness in noisy scenarios. The code of AIRMVC are available at https://github.com/xihongyang1999/AIRMVC on Github.
+
+
+\end{abstract}
+
+\section{Introduction}
+
+
+In real-world scenarios, multi-source information data is prevalent. To effectively handle such data, Multi-View Clustering (MVC) has emerged as a powerful unsupervised method. In recent years, MVC has gained significant attention and has become a prominent focus of research. Existing MVC methods can be broadly categorized into two main groups. The first group comprises traditional approaches, including Multiple Kernel Clustering (MKC)~\cite{one}, Non-negative Matrix Factorization (NMF)~\cite{wenjie_mf}, subspace clustering\cite{ZHOU_1}, and graph-based clustering~\cite{suyuan_AAAI}. With the advancement of deep neural networks, deep multi-view clustering algorithms~\cite{DealMVC,sun2024robust}, representing the second category of MVC methods, have garnered significant attention from researchers.
+
+%先注释掉
+\begin{figure}[t]
+\centering
+\includegraphics[scale=0.45]{Figure/motivation.pdf}
+\caption{An illustrative diagram of noise in a multi-view scenario. In the diagram, the areas marked with \textcolor{red}{red exclamation points} indicate instances where sensor failures or malfunctions at specific moments lead to data corruption. Compared to other views, these instances are considered noisy data.}
+\label{motivation}  
+\end{figure}
+
+While existing MVC algorithms have demonstrated notable clustering performance, they predominantly rely on the assumption that the features from all views are clean. These approaches generally adopt a standard workflow: representations are first extracted via an encoder, followed by a feature fusion strategy, and then utilized for downstream clustering tasks. The integration of clean views enables the exploitation of complementary information from different perspectives of the same sample, resulting in enhanced performance compared to single-view clustering methods. This complementary information across views is instrumental in revealing the underlying cluster structures within the data. How can the complementary information across multiple views be effectively captured? Contrastive learning presents a paradigm that utilizes self-supervised techniques to learn cross-view consistency, ensuring coherent predictions across diverse views~\cite{DIVIDE,DealMVC,MFLVC}. Alternatively, self-training explores consistency by generating a unified cluster partition, thereby facilitating the discovery of complementary information~\cite{xu2022self,wang2021generative}.
+
+
+Although the aforementioned methods have demonstrated promising results, we identified notable limitations when applied to real-world scenarios involving noisy data. Fig.~\ref{motivation} illustrates an example of noisy data in a multi-view setting, where three views are presented, and random noise exists within some of them. Moreover, we observed a significant performance degradation in existing methods under such noisy conditions (Tab.~\ref{decrese}). The noisy data not only fail to contribute positively during multi-view feature fusion but also disrupt the underlying cluster structures. Moreover, the erroneous influence of noisy data introduces considerable bias in the optimization process, thereby diminishing the advantages of complementary information across views. Consequently, the performance of these methods may even fall below that of single-view models. Detailed experimental evidence supporting this claim is presented in Section.~\ref{ab}. Recently, some noisy-based deep multi-view clustering methods have been proposed to alleviate the problem. RMCNC~\cite{sun2024robust} designed a noise-tolerance contrastive loss to mitigate the impact for noisy correspondence. MVCAN~\cite{MVCAN} employed un-shared network structure and designed a two-level optimization for multi-view clustering. Although a large improvement has been made, the exploration of noisy data in those methods remains focused on enhancing feature robustness. However, they have yet to develop dedicated frameworks for the identification and rectification of noisy data.
+
+To automatically identify and rectify the noisy data in multi-view scenario, we propose a novel deep contrastive multi-view clustering framework, termed \textbf{AIRMVC}. Specifically, we reformulate noise identification as an anomaly identification problem and introduce Gaussian Mixture Model (GMM) to address this problem. By substituting the latent variable of GMM with the soft prediction, we enable a dynamic update of GMM parameters. Based on the identification results, we introduce a hybrid rectification strategy that employs an interpolation mechanism to alleviate the adverse effects of noisy data, thereby enhancing the robustness of the correction process. In this way, the adverse effects of noisy data could be mitigated. Furthermore, by carefully refining the soft predicted distributions, we design a noise-robust contrastive mechanism to enhance the discriminative capacity of the learned representations. Furthermore, we conduct a theoretical investigation of the contrastive mechanism to validate the stability and robustness of the learned representations. Extensive experiments conducted on six benchmark datasets demonstrate the effectiveness and robustness of our proposed method. The key contributions of our paper are summarized as follows:
+\begin{itemize}
+    \item We reformulate the noise identification as an anomaly identification problem, solving it by GMM. Based on the results, we propose a hybrid rectification strategy to automatically correct the noisy data.
+    
+    \item A noise-robust contrastive mechanism is proposed to generate more reliable representations. Besides, we theoretically prove that the generated representations could discard noisy information to benefit the downstream task.
+    
+    \item We conduct extensive experiments on six benchmark datasets to verify the effectiveness and robustness of AIRMVC.
+\end{itemize}
+
+
+
+
+\section{Preliminary \& Problem Definition}
+
+In this paper, we focus on the multi-view clustering task with noisy inputs, as noise is a common occurrence in multi-source information inputs in real-world scenarios. To address this challenge, we aim to enhance the robustness of the network by automatically identifying and rectifying noisy data in an unsupervised multi-view setting. For simplicity, we provide the following symbolic definitions. Given a dataset $\{x^v\}_{v=1}^{V}$ with $V$ views and $N$ samples, we define $\textbf{E}^v_i$ and $y^v_i$ as the extracted representations and the soft predictions of class probabilities for each sample, respectively. The encoder network and decoder network are denoted as $\mathcal{F}^v(x^v;\Theta^v)$ and $\mathcal{G}^v(\textbf{E}^v;\Phi^v)$, respectively. Additional notations are summarized in Tab.~\ref{notation_table} in the Appendix.
+
+\begin{figure*}
+\centering
+\scalebox{0.52}{
+\includegraphics{Figure/overall.pdf}}
+\caption{Illustration of the overall framework of the proposed AIRMVC. Specifically, we first encode the input multi-view data to generate representations. Next, an automatic noise identification and rectification strategy is introduced to mitigate the adverse impact of noisy data. Simultaneously, we propose a noise-robust contrastive mechanism to generate more reliable and discriminative representations for the downstream clustering task.} 
+\label{overall}
+\end{figure*}
+
+
+
+Most existing multi-view clustering (MVC) methods operate under the assumption that the input multi-view data is both complete and consistent. In such idealized scenarios, the primary learning paradigm in MVC involves learning representations for $V$ independent views, followed by the application of various fusion strategies to effectively extract and utilize shared information across the views. Although these models demonstrate strong performance under ideal conditions, we observe a significant decline in robustness when low-quality, noisy views are introduced, leading to substantial performance degradation. However, noise is a pervasive issue in real-world scenarios. To further illustrate this problem, we conduct toy experiments involving clustering tasks on BBCSport and WebKB datasets under different scenarios, including noisy multi-view, clean single-view, and clean multi-view conditions. From the experimental results are presented in Fig.~\ref{eff_RS} and Tab.~\ref{decrese}, it can be observed that when confronted with noisy data, the model's performance degrades drastically, even performing worse than single-view clustering. Therefore, it is critical to mitigate the adverse effects of noisy data in multi-view clustering tasks. In the following sections, we detail our proposed strategies for the automatic identification and rectification of noise.
+
+
+\section{Methodology}
+%\subsection{Overview}
+To mitigate the negative impact of noisy data, we propose a robust \underline{A}utomatic \underline{I}dentification and \underline{R}ectification deep contrastive \underline{M}ulti-\underline{V}iew \underline{C}lustering framework with noisy view, which termed AIRMVC. The overall framework of AIRMVC is presented in Fig.~\ref{overall}. Specifically, we begin with providing the detailed descriptions of our AIRMVC, including three components, i.e., noisy identification, hybrid rectification, and the noise-robust contrastive mechanism. Then, we define the objective functions to optimize the whole model. Finally, we present the theoretical analysis of our designed noise-robust contrastive component.
+
+
+
+
+
+% \textbf{Overview}
+% \subsection{Problem Definition}
+
+
+% Most existing multi-view clustering (MVC) methods operate under the assumption that the input multi-view data is both complete and consistent. In such idealized scenarios, the primary learning paradigm in MVC involves learning representations for $V$ independent views, followed by the application of various fusion strategies to effectively extract and utilize shared information across the views. Although these models demonstrate strong performance under ideal conditions, we observe a significant decline in robustness when low-quality, noisy views are introduced, leading to substantial performance degradation. However, noise is a pervasive issue in real-world scenarios. To further illustrate this problem, we conduct toy experiments involving clustering tasks on BBCSport and WebKB datasets under different scenarios, including noisy multi-view, clean single-view, and clean multi-view conditions. From the experimental results are presented in Fig.~\ref{eff_RS} and Tab.~\ref{decrese}, it can be observed that when confronted with noisy data, the model's performance degrades drastically, even performing worse than single-view clustering. Therefore, it is critical to mitigate the adverse effects of noisy data in multi-view clustering tasks. In the following sections, we detail our proposed strategies for the automatic identification and rectification of noise.
+
+
+
+\subsection{Noisy Identification}\label{identification}
+
+For a given multi-view dataset $\{x^v\}_{v=1}^{V}$, we utilize an encoder network to generate the representations, expressed as $\textbf{E}^v = \mathcal{F}^v(x^v; \Theta^v)$. For each representation, we first process it using a multi-layer perceptron (MLP) layer as the projector. Subsequently, we model its distribution using a Gaussian Mixture Model (GMM). This process can be described as follows:
+\begin{equation}
+\begin{aligned}
+p(\textbf{E}) &= \sum_{k=1}^K p(\textbf{E}, q=k) \\
+              &= \sum_{k=1}^K p(q=k)\mathcal{N}(\textbf{E}|\mu_k, \sigma_k), 
+\end{aligned}
+\label{loss_con}
+\end{equation}
+where $q \in \{1, 2, \dots, K\}$ represents the discrete latent variables. $\mu_k$ and $\sigma_k$ denote the mean and variance, respectively. Assuming that $q$ follows a uniform distribution, the probability of $q = k$ could be expressed as $p(q = k) = \frac{1}{K}$. Based on this, the posterior probability of assigning $x_i$ to the $k$-th cluster can be calculated as:
+\begin{equation}
+\begin{aligned}
+\chi_{ik} = p(q_i =k|x_i) \propto \mathcal{N}(x_i|\mu_k, \sigma_k).
+\end{aligned}
+\label{poster_pro}
+\end{equation}
+
+The discrete variables $q$ can correspond directly to the labels in an ideal condition. The entire process can be optimized and solved using the Expectation-Maximization (EM) algorithm. However, in real-world scenarios, noisy data inputs are pervasive and unavoidable, leading to biases in the optimization process. Thus, the identification and rectification of noisy data are critically important. In unsupervised scenarios, identifying noise remains a challenging task. To address this issue, we establish a connection between the latent variable $q$ and the model prediction $y$ in an unsupervised manner. Specifically, we replace the assignment $p(q_i=k|x_i)$ with the soft prediction of the network $p(y_i=k|x_i)$. The parameters of the GMM can then be computed as follows:
+\begin{equation}
+\begin{aligned}
+\mu_k &= \text{Norm}\left ( \frac{\sum_i p(y_i=k|x_i)\textbf{E}_i}{\sum_i p(y_i=k|x_i)} \right ),\\
+\sigma_k &= \frac{\sum_i p(y_i=k|x_i)(\textbf{E}_i - \mu_k)(\textbf{E}_i - \mu_k)^{\mathsf{T}}}{\sum_i p(y_i=k|x_i)},
+\end{aligned}
+\label{mu_sigma}
+\end{equation}
+where $\text{Norm}$ means the $\ell_2$ normalization. Based on Eq.~\eqref{mu_sigma}, we reformulate Eq.~\eqref{poster_pro} by considering the intra-cluster distance. Since we implement $\ell_2$ normalization, we have $\left ( \textbf{E}-\mu_k \right )^{\mathsf{T}}\left ( \textbf{E}-\mu_k\ \right )  =2-2\textbf{E}^{\mathsf{T}}\mu_k$, the process of Eq.~\eqref{poster_pro} could be expressed by:
+\begin{equation}
+\begin{aligned}
+\chi_{ik} &= p(q_i =k|x_i)\\
+&= \frac{\text{exp}\left ( -\left ( \textbf{E}_i-\mu_k \right )^\mathsf{T} \left ( \textbf{E}_i-\mu_k\ \right ) /2\sigma_k \right )}{\sum_k{\text{exp}\left ( -\left ( \textbf{E}_i-\mu_k \right )^\mathsf{T} \left ( \textbf{E}_i-\mu_k\ \right ) /2\sigma_k \right )}}\\
+&=\frac{\text{exp}\left ( \textbf{E}_i^\mathsf{T}\mu_k/\sigma_k \right )}{\sum_k{\text{exp}\left ( \textbf{E}_i^\mathsf{T}\mu_k/\sigma_k \right )}}.
+\end{aligned}
+\label{k-cluster}
+\end{equation}
+
+In this way, we obtain the soft prediction of a sample belonging to the $k$-th cluster $(\mu_k)$. Furthermore, we combine the model's predictions with the representation distribution in an unsupervised manner and update them using the GMM. By formulating the GMM to model the distribution of representations and soft predictions, we transform the noisy identification problem into an anomaly identification problem. In a multi-view setting, if a sample is clean, its soft predictions and cluster assignments should remain consistent across the different views. For a given sample $x_i$, it is classified as either clean (normal data) or noisy (anomalous data). Based on the above analysis, we provide the conditional probability to determine the likelihood of $x_i$ containing clean information, which can be calculated as:
+\begin{equation}
+\begin{aligned}
+\chi_{y=q|i} = p(y_i =q_i|x_i) =\frac{\text{exp}\left ( \textbf{E}_i^\mathsf{T}\mu_{qi}/\sigma_{qi} \right )}{\sum_k{\text{exp}\left ( \textbf{E}_i^\mathsf{T}\mu_{k}/\sigma_{k} \right )}}.
+\end{aligned}
+\label{clean_pro}
+\end{equation}
+
+After that, we introduce a two-component GMM to automatically identify the clean probability of a given sample, presented as:
+\begin{equation}
+\begin{aligned}
+p(\chi_{y=q|i}) = \underset{\varphi_i}{\underbrace{{p(\chi_{y=q|i}, a=1)}}} +  \underset{1 - \varphi_i}{\underbrace{{p(\chi_{y=q|i}, a=0)}}}
+\end{aligned}
+\label{two-GMM}
+\end{equation}
+where $a=1$ represents the cluster of clean samples with a higher mean value, while $a=0$ corresponds to the cluster with a lower mean value. Consequently, $\varphi_i$ can be interpreted as the probability of a sample $x_i$ being clean, whereas $1-\varphi_i$ denotes the probability of $x_i$ being noisy. Using Eq.~\eqref{two-GMM}, we can calculate the posterior probability that determines whether a sample $x_i$ is clean, which is presented in Fig.~\ref{overall}(a).
+
+\subsection{Hybrid Rectification Strategy Design}
+
+In Section~\ref{identification}, we estimate the probability $\varphi_i^v$ of each sample being classified as clean in $v$-th view. Following this, we propose a hybrid rectification strategy to address noisy samples. The details of the strategy are illustrated in Fig.~\ref{overall}(b). Specifically, we utilize a combination of predicted soft distributions to perform noise rectification:
+\begin{equation}
+\begin{aligned}
+y_i^v &= h(\textbf{E}_i^v),\\ 
+m_i^v = \varphi_i^v \times y_i^v + (1 - &\varphi_i^v) \times y_i^1, v=\{2,\dots,V\},
+\end{aligned}
+\label{correct}
+\end{equation}
+where $m_i^v$ represents the mixed soft prediction, and $h(\cdot)$ denotes the classifier head. We utilize a multilayer perceptron (MLP) with a softmax function as the backbone for $h(\cdot)$. In this paper, we focus on the unsupervised clustering task, where obtaining reliable supervisory information is particularly challenging. Following previous noise-robust MVC methods~\cite{PVC, SURE, sun2024robust, MvCLN}, we assume the first view to be the clean view. Therefore, in Eq.~\eqref{two-GMM}, the mixed soft prediction is predominantly influenced by the clean samples. Conversely, as $\varphi_i$ approaches 0, the mixed soft prediction is adjusted based on the prediction of the first view.
+
+With the mixed soft prediction, we could provide the following rectification loss:
+\begin{equation}
+\begin{aligned}
+\mathcal{L}_{rs} =  \frac{1}{V-1}\sum_{v=2}^V\left ( -\sum_{i=1}^N\sum_{j=1}^K m_{ij}^v \text{log}\left (y_{ij}^v\right ) \right ),
+\end{aligned}
+\label{rectifi_loss}
+\end{equation}
+where $y^v$ represents the $v$-th soft prediction and $v\in\{2,\dots,V\}$. In this manner, the noisy data could be rectified by the cross-entropy loss. 
+A more detailed experimental analysis of the hybrid rectification strategy is presented in Section~\ref{ab}.
+
+
+\subsection{Noise-Robust Contrastive Mechanism}
+Contrastive learning~\cite{Graphlearner} has been proven to be an effective technique for enhancing representation robustness. In this subsection, we propose a noise-robust contrastive mechanism to further mitigate the impact of noisy data in multi-view clustering tasks. In unsupervised multi-view noisy scenarios, constructing positive and negative sample pairs based solely on indices may result in incorrect pairings~\cite{sun2024robust}. Ensuring the reliability of sample pair construction is a significant challenge. To improve the accuracy of pair construction, we incorporate soft predictions as an additional validation criterion. Similar to previous methods, the first step is to calculate the similarity between samples across views:
+\begin{equation}
+\begin{aligned}
+s(\textbf{E}^m_i, \textbf{E}^n_j) = \frac{\text{sim}(\textbf{E}^m_i, \textbf{E}^n_j)}{||\textbf{E}^m_i||_2 ||\textbf{E}^n_j||_2},
+\end{aligned}
+\label{sim}
+\end{equation}
+where $\text{sim}(\cdot)$ denotes the similarity function, e.g., cosine similarity. Next, we present the noise-robust contrastive loss for $i$-th and $j$-th sample in $m$-th and $n$-th view as:
+\begin{equation}
+\begin{aligned}
+\ell^{mn} &= \mathbb{I}\{(y^m_i)^\mathsf{T}(y^n_j) \ge \tau\}\\
+&\left( \text{log} (1-s(\textbf{E}^m_i, \textbf{E}^n_j)) + \text{log} (1-s(\textbf{E}^m_j, \textbf{E}^n_i)) \right), 
+\end{aligned}
+\label{contra_loss}
+\end{equation}
+where $\tau$ is the confidence threshold used to control the construction of sample pairs for contrastive learning by selecting similar samples. As illustrated in Fig.\ref{overall}(c), green denotes correctly constructed sample pairs, while red indicates incorrect ones. Our proposed strategy significantly improves the accuracy of sample pair construction, thereby enhancing the overall reliability of the contrastive learning process. Then, the robust contrastive loss for all cross-view is defined by:
+\begin{equation}
+\begin{aligned}
+\mathcal{L}_{con} =\frac{1}{V(V-1)} \sum_{m=1}^V\sum_{n=1}^V \ell^{mn}, m \neq n.
+\end{aligned}
+\label{robu_loss}
+\end{equation}
+
+
+
+
+
+
+
+\subsection{Objective Function}
+Our proposed AIRMVC is primarily optimized using three objective functions: reconstruction loss $\mathcal{L}_{rec}$, rectification loss $\mathcal{L}_{rs}$, and robust-noisy contrastive loss $\mathcal{L}_{con}$. To be specific, $\mathcal{L}_{rec}$ denotes the reconstruction procedure with autoencoder network to learn the representations $\textbf{E}$ in latent space. The process could be formulated as:
+\begin{equation}
+\begin{aligned}
+\mathcal{L}_{rec} = \sum_{v=1}^V \sum_{i=1}^N  \left \| x_i^v - \mathcal{G}^v(\mathcal{F}^v(x_i^v; \Theta^v); \Phi^v) \right \|_2^2, 
+\end{aligned}
+\label{rec_loss}
+\end{equation}
+where $\mathcal{G}^v$ and $\mathcal{F}^v$ are the decoder and encoder network for $v$-th view, respectively. In summary, the overall objective function of AIRMVC is:
+\begin{equation}
+\begin{aligned}
+\mathcal{L} = \mathcal{L}_{rec} + \alpha \cdot \mathcal{L}_{rs} + \beta \cdot \mathcal{L}_{con},
+\end{aligned}
+\label{total_loss}
+\end{equation}
+where $\alpha$ and $\beta$ are the trade-off hyper-parameters. By optimizing the overall objective function, AIRMVC could automatically identify and rectify the noisy data in unsupervised multi-view clustering task. Due to the space limited, we present the training algorithm in Alg.~\ref{Algo} in Appendix.
+
+
+
+\section{Theoretical Analysis}
+In this subsection, we examine the rationale behind our proposed noise-robust contrastive mechanism from a theoretical perspective. For clarity, we provide the following definitions of symbols. Let $x$ and $x^+$ denote the input sample and its positive sample in our noise-robust contrastive mechanism. $y$ and $y'$ represent the clean and noisy soft prediction, respectively. We consider $\textbf{E}^*$ as the representations by maximizing the mutual information between $\textbf{E}$ and $x+$, i.e., $\textbf{E}^* = \text{argmax}_{\textbf{E}} I(\textbf{E}, x^+)$. Besides, we define $I(x;y|x^+) \le \vartheta$ and $I(x;y'|x^+) > \eta$. For input sample $x$, the clean soft prediction $y$, and the noisy soft prediction $y'$, we have:
+
+
+\begin{theorem}
+The representations ${\textbf{E}^*}$ retain clean information and discard noisy information, which can be presented as:
+\begin{equation}
+\begin{aligned}
+I(x;y)- \vartheta &\le I(\textbf{E}^*;y) \le I(x;y),\\
+I(\textbf{E}^*;y') &\le I(x;y')-\eta + \vartheta.
+\end{aligned}
+\label{theorem_1}
+\end{equation} 
+\end{theorem} 
+
+\textbf{Remark:} For the input samples $x$, the corresponding positive samples $x^+$ and prediction $y_i$, $\vartheta$ could be interpreted as the relatively small information gain contributed by the positive samples $x^+$. For the fixed $x$ and its positive samples $x^+$, the information gain for the class prediction $y$ is limited. In contrast, $x^+$ contributes greater information gain to the noisy prediction $y'$, which we regard as $\eta$. By calculating the mutual information $I(x_i;y_i)$, Theorem.~\ref{theorem_1} demonstrates that the representations $\textbf{E}^*$ learned by the contrastive mechanism could discard the noisy information while preserving the clean information. The proof is provided in Section~\ref{the_proof}.
+
+% Due to the presence of noisy data, $x^+$ and $y'$ no longer correspond, leading to a greater information gain. Therefore, we can conclude that $\vartheta < \eta$.
+
+\section{Experiments}
+
+
+\begin{table}[]
+\centering
+\caption{Statistics summary of six benchmark datasets.}
+\scalebox{0.95}{
+\begin{tabular}{c|ccc}
+\hline
+\textbf{Dataset}    & \textbf{\#Views} & \textbf{\#Samples} & \textbf{\#Clusters} \\ \hline
+\textbf{BBCSport}   & 2               & 544               & 5                  \\
+\textbf{WebKB}      & 2               & 1051              & 2                  \\
+\textbf{Reuters}    & 5               & 1200              & 6                  \\
+\textbf{UCI-digit}  & 3               & 2000              & 10                 \\
+\textbf{Caltech101} & 5               & 9144              & 102                \\
+\textbf{STL10}      & 4               & 13000             & 10                 \\ \hline
+\end{tabular}}
+\label{data_info}
+\end{table}
+
+
+
+\begin{table*}[]
+\centering
+\caption{Multi-view clustering performance on six benchmark datasets (Part 1/4). The highest performance metrics are emphasized in \textcolor{red}{\textbf{red}}, while the runner-up results are marked in \textcolor{blue}{blue}.}
+\scalebox{0.78}{
+\begin{tabular}{c|cc|ccc|ccc|ccc|ccc}
+\hline
+                            & \multicolumn{2}{c|}{\textbf{Noisy Rate}}                      & \multicolumn{3}{c|}{\textbf{10\%}}                                                                                     & \multicolumn{3}{c|}{\textbf{30\%}}                                                                                     & \multicolumn{3}{c|}{\textbf{50\%}}                                                                                     & \multicolumn{3}{c}{\textbf{70\%}}                                                                                      \\ \cline{2-15} 
+\multirow{-2}{*}{\textbf{}} & \multicolumn{2}{c|}{\textbf{Metric}}                          & \textbf{ACC$\uparrow$}                 & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{CANDY}}   & \textbf{NeurIPS 2024} & 23.16                                 & 05.60                                 & 40.62                                 & 19.49                                 & 03.93                                 & 38.79                                 & 17.10                                 & 03.72                                 & 38.42                                 & 16.36                                 & 02.68                                 & 36.58                                 \\
+                            & \multicolumn{1}{c|}{\textbf{RMCNC}}   & \textbf{TKDE 2024}    & 35.48                                 & 15.80                                 & 35.48                                 & 30.57                                 & 12.87                                 & 30.57                                 & 28.56                                 & 10.67                                 & 28.05                                 & 24.26                                 & 04.57                                 & 24.26                                 \\
+                            & \multicolumn{1}{c|}{\textbf{TGM-MVC}} & \textbf{ACM MM 2024}  & 37.28                                 & 08.39                                 & 40.84                                 & 36.37                                 & 06.33                                 & 38.82                                 & 30.19                                 & 05.81                                 & 30.40                                 & 25.13                                 & 04.16                                 & 25.13                                 \\
+                            & \multicolumn{1}{c|}{\textbf{SCE-MVC}} & \textbf{NeurIPS 2024} & {\color[HTML]{3531FF} 47.06}          & 15.96                                 & {\color[HTML]{3531FF} 47.98}          & {\color[HTML]{3531FF} 45.40}          & 15.67                                 & {\color[HTML]{3531FF} 45.96}          & {\color[HTML]{3531FF} 43.57}          & {\color[HTML]{3531FF} 12.72}          & {\color[HTML]{3531FF} 45.22}          & {\color[HTML]{3531FF} 39.73}          & {\color[HTML]{3531FF} 12.95}          & {\color[HTML]{3531FF} 39.46}          \\
+                            & \multicolumn{1}{c|}{\textbf{MVCAN}}   & \textbf{CVPR 2024}    & 44.85                                 & {\color[HTML]{3531FF} 18.99}          & 44.85                                 & 39.15                                 & {\color[HTML]{3531FF} 15.81}          & 39.15                                 & 26.65                                 & 11.85                                 & 25.97                                 & 24.26                                 & 06.57                                 & 23.76                                 \\
+                            & \multicolumn{1}{c|}{\textbf{DIVIDE}}  & \textbf{AAAI 2024}    & 31.25                                 & 04.57                                 & 38.60                                 & 30.15                                 & 03.28                                 & 36.76                                 & 28.68                                 & 02.65                                 & 35.66                                 & 27.02                                 & 02.22                                 & 36.03                                 \\
+\multirow{-6}{*}{\rotatebox{90}{\textbf{BBCSport}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}        & {\color[HTML]{FF0000} \textbf{49.45}} & {\color[HTML]{FF0000} \textbf{28.63}} & {\color[HTML]{FF0000} \textbf{49.44}} & {\color[HTML]{FF0000} \textbf{45.59}} & {\color[HTML]{FF0000} \textbf{20.11}} & {\color[HTML]{FF0000} \textbf{47.24}} & {\color[HTML]{FF0000} \textbf{45.04}} & {\color[HTML]{FF0000} \textbf{23.34}} & {\color[HTML]{FF0000} \textbf{53.13}} & {\color[HTML]{FF0000} \textbf{40.99}} & {\color[HTML]{FF0000} \textbf{16.52}} & {\color[HTML]{FF0000} \textbf{45.59}} \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{CANDY}}   & \textbf{NeurIPS 2024} & 19.03                                 & 12.41                                 & 19.03                                 & 18.08                                 & 10.85                                 & 18.10                                 & 16.56                                 & 07.84                                 & 16.56                                 & 15.60                                 & 04.87                                 & 15.60                                 \\
+                            & \multicolumn{1}{c|}{\textbf{RMCNC}}   & \textbf{TKDE 2024}    & {\color[HTML]{3531FF} 78.12}          & 10.77                                 & 78.10                                 & 66.98                                 & 08.78                                 & 66.98                                 & 60.04                                 & 06.24                                 & 60.00                                 & 52.71                                 & 04.35                                 & 52.16                                 \\
+                            & \multicolumn{1}{c|}{\textbf{TGM-MVC}} & \textbf{ACM MM 2024}  & 76.86                                 & 13.81                                 & 76.86                                 & 71.87                                 & 11.65                                 & {\color[HTML]{3531FF} 71.87}          & 62.86                                 & 08.04                                 & {\color[HTML]{3531FF} 62.86}          & 55.51                                 & {\color[HTML]{FF0000} \textbf{06.87}}           & 55.50                                 \\
+                            & \multicolumn{1}{c|}{\textbf{MVCAN}}   & \textbf{CVPR 2024}    & 77.83                                 & 12.39                                 & {\color[HTML]{3531FF} 78.12}          & 67.46                                 & 06.20                                 & 67.46                                 & 64.22                                 & 05.94                                 & 64.22                                 & 55.66                                 & 05.74                                 & 55.65                                 \\
+                            & \multicolumn{1}{c|}{\textbf{SCE-MVC}} & \textbf{NeurIPS 2024} & 76.78                                 & {\color[HTML]{3531FF} 18.78}          & 69.65                                 & {\color[HTML]{3531FF} 74.12}          & {\color[HTML]{3531FF} 13.22}          & 68.19                                 & {\color[HTML]{3531FF} 65.75}          & {\color[HTML]{3531FF} 08.17}          & 62.18                                 & {\color[HTML]{3531FF} 60.08}          & 03.52                                 & {\color[HTML]{3531FF} 60.77}          \\
+                            & \multicolumn{1}{c|}{\textbf{DIVIDE}}  & \textbf{AAAI 2024}    & 66.41                                 & 15.14                                 & 69.28                                 & 53.66                                 & 10.91                                 & 57.65                                 & 52.24                                 & 07.70                                 & 56.26                                 & 51.38                                 & 05.60                                 & 55.34                                 \\
+\multirow{-7}{*}{\rotatebox{90}{\textbf{WebKB}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}         & {\color[HTML]{FF0000} \textbf{83.73}} & {\color[HTML]{FF0000} \textbf{27.15}} & {\color[HTML]{FF0000} \textbf{83.73}} & {\color[HTML]{FF0000} \textbf{77.93}} & {\color[HTML]{FF0000} \textbf{13.48}} & {\color[HTML]{FF0000} \textbf{78.12}} & {\color[HTML]{FF0000} \textbf{74.98}} & {\color[HTML]{FF0000} \textbf{08.42}} & {\color[HTML]{FF0000} \textbf{74.98}} & {\color[HTML]{FF0000} \textbf{62.89}} & {\color[HTML]{3531FF} {06.69}} & {\color[HTML]{FF0000} \textbf{62.32}} \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{CANDY}}   & \textbf{NeurIPS 2024} & 24.58                                 & 08.50                                 & 33.75                                 & 22.17                                 & 08.09                                 & 33.08                                 & 20.83                                 & 05.57                                 & 29.25                                 & 18.83                                 & 04.44                                 & 26.75                                 \\
+                            & \multicolumn{1}{c|}{\textbf{RMCNC}}   & \textbf{TKDE 2024}    & 39.42                                 & 24.21                                 & 41.83                                 & 35.83                                 & 16.96                                 & 37.83                                 & 30.17                                 & 10.92                                 & 31.67                                 & 26.83                                 & 09.07                                 & 28.75                                 \\
+                            & \multicolumn{1}{c|}{\textbf{TGM-MVC}} & \textbf{ACM MM 2024}  & 31.28                                 & 09.05                                 & 31.53                                 & 30.30                                 & 08.51                                 & 30.30                                 & 26.44                                 & 06.78                                 & 27.59                                 & 23.90                                 & 04.58                                 & 25.42                                 \\
+                            & \multicolumn{1}{c|}{\textbf{SCE-MVC}} & \textbf{NeurIPS 2024} & 43.25                                 & 22.89                                 & 43.23                                 & {\color[HTML]{3531FF} 41.25}          & {\color[HTML]{3531FF} 20.00}          & {\color[HTML]{3531FF} 41.92}          & {\color[HTML]{3531FF} 39.92}          & {\color[HTML]{FF0000} \textbf{22.42}} & {\color[HTML]{3531FF} 39.09}          & {\color[HTML]{3531FF} 39.33}          & {\color[HTML]{3531FF} 19.87}          & {\color[HTML]{3531FF} 39.08}          \\
+                            & \multicolumn{1}{c|}{\textbf{MVCAN}}   & \textbf{CVPR 2024}    & {\color[HTML]{3531FF} 45.25}          & {\color[HTML]{3531FF} 23.50}          & {\color[HTML]{3531FF} 45.50}          & 37.67                                 & 14.53                                 & 38.75                                 & 29.67                                 & 14.04                                 & 30.25                                 & 23.25                                 & 18.47                                 & 25.08                                 \\
+                            & \multicolumn{1}{c|}{\textbf{DIVIDE}}  & \textbf{AAAI 2024}    & 41.08                                 & 16.82                                 & 42.50                                 & 33.42                                 & 13.42                                 & 34.42                                 & 30.50                                 & 10.03                                 & 33.25                                 & 27.92                                 & 09.39                                 & 28.61                                 \\
+\multirow{-6}{*}{\rotatebox{90}{\textbf{Reuters}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}        & {\color[HTML]{FF0000} \textbf{48.25}}                       & {\color[HTML]{FF0000} \textbf{26.34}}                        & {\color[HTML]{FF0000} \textbf{48.25}}                        & {\color[HTML]{FF0000} \textbf{46.67}}                        & {\color[HTML]{FF0000} \textbf{23.54}}                        & {\color[HTML]{FF0000} \textbf{46.67}}                        & {\color[HTML]{FF0000} \textbf{44.83}}                        & {\color[HTML]{3531FF} 21.72}                       & {\color[HTML]{FF0000} \textbf{45.58}}                        & {\color[HTML]{FF0000} \textbf{41.75}}                        & {\color[HTML]{FF0000} \textbf{20.91}}                         & {\color[HTML]{FF0000} \textbf{42.33}}                         \\ \hline
+\end{tabular}}
+\label{com_res1}
+\end{table*}
+
+In this section, we perform a series of experiments to evaluate the effectiveness and advantages of our proposed method. Specifically, we aim to address the following research questions (\textbf{RQs}): \textbf{RQ1}: How does AIRMVC compare with other leading deep multi-view clustering techniques in terms of performance? \textbf{RQ2}: What art the impacts of the components of AIRMVC to enhance multi-view clustering results? \textbf{RQ3}: What clustering structures are identified by AIRMVC? \textbf{RQ4}: What is the effect of hyper-parameters on the efficacy of AIRMVC?
+
+% \begin{itemize}
+% \item \textbf{RQ1}: How does AIRMVC compare with other leading deep multi-view clustering techniques in terms of performance?
+% \item \textbf{RQ2}: What art the impacts of the components of AIRMVC to enhance multi-view clustering results?
+% \item \textbf{RQ3}: What clustering structures are identified by AIRMVC?
+% \item \textbf{RQ4}: What is the effect of hyper-parameters on the efficacy of AIRMVC?
+% \end{itemize}
+
+% \footnote{\url{http://mlg.ucd.ie/datasets/bbc.html}}
+% \footnote{\url{http://archive.ics.uci.edu/dataset/137/reuters+21578+text+categorization+collection}}
+% \footnote{\url{https://data.caltech.edu/records/mzrjq-6wc02}}
+% \footnote{\url{https://cs.nyu.edu/∼roweis/data.html}}
+% \footnote{\url{https://lig-membres.imag.fr/grimal/data.html}}
+% \footnote{\url{https://rgbd.cs.princeton.edu/}}
+% \footnote{\url{https://cs.stanford.edu/~acoates/stl10/}}
+
+\subsection{Experimental Settings}
+\textbf{{Datasets:}} To evaluate the effectiveness of the proposed AIRMVC framework, we implement comprehensive experiments on six widely used datasets: BBCSport, Reuters, Caltech101, UCI-digit, WebKB, SUNRGB-D, and STL10. Tab.~\ref{data_info} provides detailed statistical information for all datasets. To simulate a noisy input environment, we randomly introduce noise into the multi-view input data $x$ at varying proportions of \{10\%, 30\%, 50\%, 70\%, 90\%\}.
+
+% Most existing multi-view clustering methods operate under the assumption that the input multi-view data is consistent and clean. However, in real-world scenarios, the features of the views may be affected by noise. 
+% Most existing methods~\cite{MVCAN, ye_noise} for simulating noise views often create an additional view by randomly sampling noise to emulate noisy scenarios. In contrast, our approach directly incorporates random noise into the views, providing a closer alignment with real-world conditions.
+
+\textbf{Evaluation Metrics:} To provide a thorough evaluation of the model's clustering performance, we utilize three widely recognized metrics: Accuracy (ACC), Normalized Mutual Information (NMI), and Purity (PUR). To ensure a fair comparison, all methods are assessed across 10 independent runs, and the average results are reported.
+
+
+\textbf{{Comparison algorithms:}} To showcase the broad applicability and superior performance of the proposed AIRMVC, we compare it against 11 state-of-the-art deep multi-view clustering methods. These baselines are categorized into two groups: classical deep multi-view clustering methods (CoMVC~\cite{SiMVC}, SiMVC~\cite{SiMVC}, MFLVC~\cite{MFLVC}, DealMVC~\cite{DealMVC}, SURE~\cite{SURE}, CANDY~\cite{candy}, DIVIDE~\cite{DIVIDE}, TGM-MVC~\cite{TGM-MVC}, and SCE-MVC~\cite{SCE-MVC}) and noise-resilient deep multi-view clustering methods (RMCNC~\cite{sun2024robust} and MVCAN~\cite{MVCAN}). Detailed information on these baselines is provided in Section.~\ref{com_methods} of the Appendix.
+
+
+
+
+\textbf{{Implement Details:}} In this study, all experiments are conducted on the PyTorch~\cite{pytorch} platform using an NVIDIA A6000 GPU. For fair comparison, we reproduce the results of all baselines using the original source codes and configurations provided by their authors. Our proposed AIRMVC is trained using the Adam optimizer~\cite{adam} with its default settings. To enhance the discriminative power of the network and obtain reliable soft predictions in an unsupervised setting, we pre-train the model with an auto-encoder module for 100 epochs. The trade-off hyperparameters $\alpha$ and $\beta$ are consistently set to 1.0. The maximal training epoch is set to 400 for all datasets. A detailed overview of the hyperparameter settings is provided in Tab.~\ref{hyper-para} in the Appendix.
+
+
+% The learning rate is set to 3e-3 for the BBCSport, Caltech-7, UCI-digit, and STL10 datasets, and 5e-3 for the Movies dataset. The training is conducted for 400 epochs with a batch size of 256 for all datasets. 
+
+\subsection{Comparison Experiments~\textbf{(RQ1)}}
+
+
+\begin{table*}[]
+\centering
+\caption{Multi-view clustering performance on six benchmark datasets (Part 2/4). The highest performance metrics are emphasized in \textcolor{red}{\textbf{red}}, while the runner-up results are marked in \textcolor{blue}{blue}.}
+\scalebox{0.78}{
+\begin{tabular}{c|cc|ccc|ccc|ccc|ccc}
+\hline
+                            & \multicolumn{2}{c|}{\textbf{Noisy Rate}}                      & \multicolumn{3}{c|}{\textbf{10\%}}                                                                                     & \multicolumn{3}{c|}{\textbf{30\%}}                                                                                     & \multicolumn{3}{c|}{\textbf{50\%}}                                                                                     & \multicolumn{3}{c}{\textbf{70\%}}                                                                                      \\ \cline{2-15} 
+\multirow{-2}{*}{\textbf{}} & \multicolumn{2}{c|}{\textbf{Metric}}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{CANDY}}   & \textbf{NeurIPS 2024} & 80.90                                 & 67.70                                 & 80.90                                 & 72.30                                 & 61.19                                 & 72.30                                 & 67.10                                 & 54.94                                 & 67.10                                 & 63.10                                 & 52.50                                 & 65.20                                 \\
+                            & \multicolumn{1}{c|}{\textbf{RMCNC}}   & \textbf{TKDE 2024}    & 27.40                                 & 14.74                                 & 29.50                                 & 25.20                                 & 12.17                                 & 26.80                                 & 23.65                                 & 11.22                                 & 25.30                                 & 22.20                                 & 10.10                                 & 24.05                                 \\
+                            & \multicolumn{1}{c|}{\textbf{TGM-MVC}} & \textbf{ACM MM 2024}  & 60.23                                 & 65.08                                 & 64.89                                 & 59.52                                 & 64.03                                 & 63.60                                 & 56.31                                 & 60.23                                 & 60.25                                 & 52.01                                 & {\color[HTML]{3531FF} 56.88}          & 58.28                                 \\
+                            & \multicolumn{1}{c|}{\textbf{SCE-MVC}} & \textbf{NeurIPS 2024} & 72.60                                 & 71.70                                 & 72.55                                 & 68.30                                 & 67.49                                 & 70.00                                 & 66.55                                 & {\color[HTML]{3531FF} 67.10}          & 68.80                                 & 64.45                                 & 55.58                                 & 66.30                                 \\
+                            & \multicolumn{1}{c|}{\textbf{MVCAN}}   & \textbf{CVPR 2024}    & 86.50                                 & 79.00                                 & 86.50                                 & 74.35                                 & {\color[HTML]{3531FF} 72.78}          & 76.90                                 & 64.15                                 & 66.54                                 & 67.65                                 & 63.10                                 & 54.21                                 & 63.24                                 \\
+                            & \multicolumn{1}{c|}{\textbf{DIVIDE}}  & \textbf{AAAI 2024}    & {\color[HTML]{3531FF} 88.20}          & {\color[HTML]{3531FF} 80.28}          & {\color[HTML]{3531FF} 88.20}          & {\color[HTML]{3531FF} 76.00}          & 71.56                                 & {\color[HTML]{3531FF} 78.45}          & {\color[HTML]{3531FF} 71.00}          & 62.80                                 & {\color[HTML]{3531FF} 74.20}          & {\color[HTML]{3531FF} 66.25}          & 54.72                                 & {\color[HTML]{FF0000} \textbf{68.25}} \\
+\multirow{-6}{*}{\rotatebox{90}{\textbf{UCI-digit}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}        & {\color[HTML]{FF0000} \textbf{93.95}} & {\color[HTML]{FF0000} \textbf{89.08}} & {\color[HTML]{FF0000} \textbf{93.95}} & {\color[HTML]{FF0000} \textbf{77.60}} & {\color[HTML]{FF0000} \textbf{76.65}} & {\color[HTML]{FF0000} \textbf{80.75}} & {\color[HTML]{FF0000} \textbf{76.05}} & {\color[HTML]{FF0000} \textbf{68.17}} & {\color[HTML]{FF0000} \textbf{76.05}} & {\color[HTML]{FF0000} \textbf{69.20}} & {\color[HTML]{FF0000} \textbf{60.38}} & {\color[HTML]{FF0000} \textbf{69.20}} \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{CANDY}}   & \textbf{NeurIPS 2024} & 16.67                                 & 16.93                                 & 19.67                                 & 15.87                                 & 16.62                                 & 19.19                                 & 10.64                                 & 10.91                                 & 10.94                                 & 10.98                                 & 15.14                                 & 17.35                                 \\
+                            & \multicolumn{1}{c|}{\textbf{RMCNC}}   & \textbf{TKDE 2024}    & 08.75                                 & 16.57                                 & 08.71                                 & 07.20                                 & 16.02                                 & 07.21                                 & 06.94                                 & 12.87                                 & 06.87                                 & 06.71                                 & 11.58                                 & 06.71                                 \\
+                            & \multicolumn{1}{c|}{\textbf{TGM-MVC}} & \textbf{ACM MM 2024}  & 12.81                                 & 31.50                                 & {\color[HTML]{3531FF} 28.95}          & 10.58                                 & {\color[HTML]{3531FF} 26.57}          & {\color[HTML]{3531FF} 26.25}          & 07.16                                 & 21.84                                 & {\color[HTML]{3531FF} 19.54}          & 06.66                                 & {\color[HTML]{3531FF} 20.46}          & {\color[HTML]{3531FF} 18.57}          \\
+                            & \multicolumn{1}{c|}{\textbf{MVCAN}}   & \textbf{CVPR 2024}    & {\color[HTML]{3531FF} 20.53}          & {\color[HTML]{3531FF} 35.81}          & 24.60                                 & 14.30                                 & 26.02                                 & 14.14                                 & 10.28                                 & 23.19                                 & 10.99                                 & 10.34                                 & 20.43                                 & 10.44                                 \\
+                            & \multicolumn{1}{c|}{\textbf{SCE-MVC}} & \textbf{NeurIPS 2024} & 20.33                                 & 35.28                                 & 17.62                                 & 14.25                                 & 25.74                                 & 14.01                                 & 10.78                                 & 20.51                                 & 10.44                                 & {\color[HTML]{3531FF} 10.77}          & 19.46                                 & 08.54                                 \\
+                            & \multicolumn{1}{c|}{\textbf{DIVIDE}}  & \textbf{AAAI 2024}    & 18.03                                 & 35.40                                 & 20.41                                 & {\color[HTML]{3531FF} 15.10}          & 25.80                                 & 20.08                                 & {\color[HTML]{3531FF} 11.10}          & {\color[HTML]{3531FF} 23.33}          & 16.33                                 & 10.16                                 & 18.88                                 & 14.87                                 \\
+\multirow{-6}{*}{\rotatebox{90}{\textbf{Caltech101}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}        & {\color[HTML]{FF0000} \textbf{21.45}}                        & {\color[HTML]{FF0000} \textbf{37.16}}                        & {\color[HTML]{FF0000} \textbf{34.69}}                        & {\color[HTML]{FF0000} \textbf{15.89}}                        & {\color[HTML]{FF0000} \textbf{29.39}}                        & {\color[HTML]{FF0000} \textbf{27.60}}                        & {\color[HTML]{FF0000} \textbf{11.80}}                        & {\color[HTML]{FF0000} \textbf{23.66}}                        & {\color[HTML]{FF0000} \textbf{23.33}}                        & {\color[HTML]{FF0000} \textbf{11.89}}                        & {\color[HTML]{FF0000} \textbf{21.14}}                        & {\color[HTML]{FF0000} \textbf{20.14}}                        \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{CANDY}}   & \textbf{NeurIPS 2024} & 27.08                                 & 21.03                                 & 27.33                                 & 20.56                                 & 19.23                                 & 20.21                                 & 18.19                                 & 18.48                                 & 18.77                                 & 17.49                                 & 16.79                                 & 17.80                                 \\
+                            & \multicolumn{1}{c|}{\textbf{RMCNC}}   & \textbf{TKDE 2024}    & 16.51                                 & 03.56                                 & 16.92                                 & 15.85                                 & 02.94                                 & 16.22                                 & 14.78                                 & 02.33                                 & 15.12                                 & 14.12                                 & 01.70                                 & 14.95                                 \\
+                            & \multicolumn{1}{c|}{\textbf{TGM-MVC}} & \textbf{ACM MM 2024}  & 27.50                                 & 19.51                                 & {\color[HTML]{3531FF} 28.10}          & 21.80                                 & {\color[HTML]{3531FF} 21.62}          & 21.65                                 & 20.01                                 & 20.02                                 & {\color[HTML]{3531FF} 20.78}          & {\color[HTML]{3531FF} 19.87}          & 14.05                                 & 19.77                                 \\
+                            & \multicolumn{1}{c|}{\textbf{SCE-MVC}} & \textbf{NeurIPS 2024} & 27.58                                 & 23.97                                 & 27.05                                 & 20.77                                 & 19.34                                 & 20.92                                 & 18.45                                 & 14.51                                 & 20.10                                 & 15.85                                 & 12.60                                 & 16.93                                 \\
+                            & \multicolumn{1}{c|}{\textbf{MVCAN}}   & \textbf{CVPR 2024}    & 26.64                                 & 24.05                                 & 26.57                                 & 21.62                                 & 20.17                                 & 20.52                                 & 19.36                                 & 20.01                                 & 19.09                                 & 17.25                                 & 17.96                                 & 17.37                                 \\
+                            & \multicolumn{1}{c|}{\textbf{DIVIDE}}  & \textbf{AAAI 2024}    & {\color[HTML]{3531FF} 27.58}          & {\color[HTML]{3531FF} 24.54}          & 27.08                                 & {\color[HTML]{3531FF} 22.03}          & 20.55                                 & {\color[HTML]{3531FF} 22.17}          & {\color[HTML]{3531FF} 20.78}          & {\color[HTML]{3531FF} 20.25}          & 20.61                                 & 16.86                                 & {\color[HTML]{3531FF} 20.25}          & {\color[HTML]{FF0000} \textbf{20.28}}          \\
+\multirow{-7}{*}{\rotatebox{90}{\textbf{STL10}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}         & {\color[HTML]{FF0000} \textbf{28.81}} & {\color[HTML]{FF0000} \textbf{25.04}} & {\color[HTML]{FF0000} \textbf{29.01}} & {\color[HTML]{FF0000} \textbf{22.46}} & {\color[HTML]{FF0000} \textbf{23.64}} & {\color[HTML]{FF0000} \textbf{22.46}} & {\color[HTML]{FF0000} \textbf{21.95}} & {\color[HTML]{FF0000} \textbf{23.09}} & {\color[HTML]{FF0000} \textbf{22.02}} & {\color[HTML]{FF0000} \textbf{20.14}} & {\color[HTML]{FF0000} \textbf{22.66}} & {\color[HTML]{3531FF} {20.14}} \\ \hline
+\end{tabular}}
+\label{com_res2}
+\vspace{-10pt}
+\end{table*}
+
+
+
+
+
+
+
+
+
+In this subsection, we conduct comprehensive experiments to demonstrate the superior and effectiveness of our designed AIRMVC. To be specific, we compare with 11 state-of-the-art baselines with different noise ratio. The experimental results are presented in Tab.~\ref{com_res1},~\ref{com_res2},~\ref{com_res3},~\ref{com_res4},~\ref{com_res5}. We highlight the optimal results in bold red, and the sub-optimal results with blue. Due to the space limited, we present Tab.~\ref{com_res3},~\ref{com_res4},~\ref{com_res5} in Section.~\ref{add_exp} of Appendix. From the results, we could observe the following observations:
+
+%关于实验结论的讨论，没必要分1 2 3 4, 合在一起写一段就好，也不用换行
+1) AIRMVC significantly outperforms state-of-the-art baselines across most metrics and datasets. To be specific, compared to the best multi-view clustering algorithm, AIRMVC achieves remarkable improvements by 2.39\%, 9.64\%, and 1.46\% w.r.t. ACC, NMI and PUR in BBCSport dataset with 10\% noise. We analyze the reason is that AIRMVC could automatically identify and rectify the noisy data, leading to a robust learning procedure. 
+
+2) When noise is present in multi-view data, the performance of deep multi-view clustering models tends to become unstable. The clustering performance of the model exhibits a downward trend as the noise proportion increases. We attribute this decline to the distortion of the underlying clustering structure caused by the presence of noisy data. 
+
+
+\begin{figure}[]
+\centering
+\small
+\begin{minipage}{0.45\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Ablation/decline_acc.pdf}}
+\vspace{3pt}
+{\centerline{ACC}}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\centerline{\includegraphics[width=\textwidth]{Figure/Ablation/decline_nmi.pdf}}
+\vspace{3pt}
+{\centerline{NMI}}
+\end{minipage}
+\caption{Ablation studies for our proposed noisy-identification and rectification strategy on BBCSport dataset.}
+\label{eff_RS}
+\vspace{-20pt}
+\end{figure}
+
+
+3) Compared with the classical deep multi-view clustering methods, e.g., TGM-MVC~\cite{TGM-MVC}, our AIRMVC could achieve better performance. These methods lack specifically designed strategies to mitigate the adverse effects of noise, which consequently leads to a decline in performance. 
+
+4) Although noise deep multi-view clustering methods could obtain promising performance, e.g., MVCAN~\cite{MVCAN}, the impact of noise has not been fully eliminated in complex noisy scenario. The noisy identification and rectification strategies and noise-robust contrastive mechanism in AIRMVC could identify and rectify the noisy data. Thus, achieving better performance.
+
+In summary, AIRMVC enables robust training under varying levels of noise. Moreover, the above observations and experimental results further validate the effectiveness and generalization capability of AIRMVC.
+
+
+\begin{table}[]
+\centering
+\caption{Performance variation of multi-view clustering on WebKB dataset in noisy scenario with 10\% noisy ratio.}
+\scalebox{0.8}{
+\begin{tabular}{c|ccc|ccc}
+\hline
+\textbf{Methods} & \multicolumn{3}{c|}{\textbf{TGM-MVC}}      & \multicolumn{3}{c}{\textbf{SCE-MVC}}       \\ \hline
+\textbf{Metrics} & \textbf{ACC} & \textbf{NMI} & \textbf{PUR} & \textbf{ACC} & \textbf{NMI} & \textbf{PUR} \\ \hline
+\textbf{Clean}   & 81.45        & 15.70         & 81.45        & 83.43        & 20.64        & 83.43        \\
+\textbf{Noise}   & 76.86$\downarrow$        & 13.81$\downarrow$        & 76.86$\downarrow$        & 76.78$\downarrow$        & 18.78$\downarrow$        & 69.65$\downarrow$        \\ \hline
+\end{tabular}}
+\label{decrese}
+\vspace{-20pt}
+\end{table}
+
+
+\begin{figure*}[]
+\centering
+\small
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Ablation/01/BBCSport.pdf}}
+{\centerline{BBCSport}}
+\end{minipage}
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Ablation/01/cal101.pdf}}
+{\centerline{Caltech101}}
+\end{minipage}
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=\textwidth]{Figure/Ablation/01/stl10.pdf}}
+{\centerline{STL10}}
+\end{minipage}
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=\textwidth]{Figure/Ablation/01/retu.pdf}}
+{\centerline{Reuters}}
+\end{minipage}
+\caption{Ablation studies on BBCSport, Caltech101, STL10, and Reuters datasets with 10\% noisy ratio.}
+\label{ablation_study}
+\end{figure*}
+
+
+\begin{figure*}
+\centering
+\begin{minipage}{0.22\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_20.png}}
+\vspace{5pt}
+\centerline{{20 Epoch}}
+\end{minipage}\hspace{5pt}
+\begin{minipage}{0.22\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_80.png}}
+\vspace{5pt}
+\centerline{{80 Epoch}}
+\end{minipage}\hspace{5pt}
+\begin{minipage}{0.22\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_140.png}}
+\vspace{5pt}
+\centerline{{140 Epoch}}
+\end{minipage}\hspace{5pt}
+\begin{minipage}{0.22\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_200.png}}
+\vspace{5pt}
+\centerline{{200 Epoch}}
+\end{minipage}
+\caption{Visualization of the representations during the training process on UCI-digit dataset.}
+\label{t_sne}
+\vspace{-10pt}
+\end{figure*}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Ablation Study~\textbf{(RQ2)}}\label{ab}
+In this subsection, we conduct experiments to investigate the effectiveness of the components in AIRMVC. Due to the space limited, we present the experimental results with 30\% noise ratio in Section.~\ref{other_ab} of Appendix.
+
+
+
+
+
+\textbf{Effectiveness of design modules:} Here, we implement ablation studies to verify the designed modules, including the noisy identification and rectification strategy and noise-robust contrastive mechanism. In this subsection, we denote ``(w/o) D\&R'', ``(w/o) Con'', and ``(w/o) D\&R\&Con'' represent the model to remove noisy identification and rectification strategy, noise-robust contrastive mechanism, and both modules combined, respectively. Besides, we leverage an autoencoder network as the backbone for ``(w/o) D\&R\&Con'' to derive representations for the downstream clustering task. We conduct experiments with three metrics on six datasets. The experimental results are demonstrated in Fig.~\ref{ablation_study}. From those results, we could conclude the following observations: 
+
+1) When any component of our designed model is removed, the performance of the model degrades. This indicates that each part of our design contributes to the overall clustering performance. 
+
+2) The removal of noisy identification and rectification strategy (``(w/o) D\&R'') results in a more substantial performance degradation compared to the removal of noise-robust contrastive mechanism (``(w/o) Con''), highlighting the relative importance of noisy identification and rectification strategy to the model’s performance. 
+
+
+
+%设计实验
+%单个视图的结果 1
+%带噪声情况下的直接融合结果 2
+%直接CE校正结果 3
+%我们的结果 4
+%2<1<3<4
+%以BBCSport为例子
+
+% \begin{table}[]
+% \centering
+% \scalebox{0.9}{
+% \begin{tabular}{c|c|cc}
+% \hline
+% \textbf{Methods}                  & \textbf{Metrics} & \textbf{Clean} & \textbf{Noise} \\ \hline
+% \multirow{3}{*}{\textbf{TGM-MVC}} & ACC              & 81.45          & 76.86          \\
+%                                   & NMI              & 15.7           & 13.81          \\
+%                                   & PUR              & 81.45          & 76.86          \\ \hline
+% \multirow{3}{*}{\textbf{SCE-MVC}} & ACC              & 83.43          & 76.78          \\
+%                                   & NMI              & 20.64          & 18.78          \\
+%                                   & PUR              & 83.43          & 69.65          \\ \hline
+% \multirow{3}{*}{\textbf{DealMVC}} & ACC              & 79.26          & 66.03          \\
+%                                   & NMI              & 15.32          & 15.02          \\
+%                                   & PUR              & 79.26          & 65.27          \\ \hline
+% \end{tabular}}
+% \end{table}
+
+
+
+
+
+
+
+\textbf{Effectiveness of rectification strategy:}
+
+In AIRMVC, we rectify the noisy data with two steps. Specifically, we first employ two-component GMM to identify the noisy data. Then, we rectify the noisy data based on identification result. To illustrate the adverse effects of noise, we present experimental evidence in Tab.~\ref{decrese} using the WebKB dataset, demonstrating a significant performance degradation in noisy scenarios. This underscores the necessity of designing a strategy specifically targeted at noise identification and rectification.To further validate the effectiveness of our noise identification and rectification strategy, we conduct experiments on the BBCSport dataset with a 10\% noise ratio. For a comprehensive evaluation, we define four different experimental setups. For simplicity, we use ``Noisy Data'' to represent the direct fusion of noisy multi-view features, ``Single View'' to represent the results from a single noisy view, ``Directly Rectify'' to represent directly using cross-entropy with the first view to rectify, and ``Ours'' to represent our proposed strategy. The experimental results are presented in Fig.~\ref{eff_RS}. From these results, we can derive the following observations:
+
+
+
+
+
+1) Directly fusing noisy multi-view data results in the worst clustering performance. We attribute this phenomenon to the lack of any noisy rectification mechanism, allowing the noisy views to mutually amplify their adverse effects. Furthermore, the fusion process exacerbates the impact of noise. Without rectification, the clustering performance of multi-view data is even worse than that of a single view. 
+
+2) Compared to the directly rectification with the first view, our proposed AIRMVC could achieve better performance. This phenomenon can be attributed to the tendency of directly using the correction results from the first view to homogenize features across different views. In contrast, our noisy identification and rectification strategy effectively filters out noisy data from each view while retaining complementary information that is beneficial for downstream tasks.
+
+
+
+
+\subsection{Visualization Analysis~\textbf{(RQ3)}}
+% To visualize the latent representation space and evaluate the effectiveness of AIRMVC, we use $t$-SNE~\cite{TSNE} as the backbone network to employ experiments. Specifically, we extract the representations with UCI-digit dataset. From the results presented in Fig.~\ref{t_sne}, we could observe as follows. With training progresses, the cluster structures on the UCI-digit dataset become increasingly apparent. By the 200 epochs, distinguishable cluster structures have emerged. This demonstrates that AIRMVC is effective in uncovering the latent cluster structures of features. Due to the limited space, we response \textbf{RQ4} in Section.~\ref{rq4} in Appendix.
+
+To visualize the latent representation space and assess the effectiveness of AIRMVC, we employ $t$-SNE~\cite{TSNE} as the visualization tool in our experiments. Specifically, we extract representations from the UCI-digit dataset. The results, as shown in Fig.~\ref{t_sne}, reveal the following observations. As training progresses, the cluster structures within the UCI-digit dataset become increasingly distinct. By the 200th epoch, well-defined and distinguishable cluster structures have emerged. This observation demonstrates the capability of AIRMVC to effectively uncover the latent cluster structures within feature representations.
+
+% Due to space constraints, we address \textbf{RQ4} in further detail in Section~\ref{rq4} of the Appendix.  
+
+
+
+\begin{figure*}[h]
+\centering
+\begin{minipage}{0.3\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/tau/01/ACC_tau.pdf}}
+% \vspace{5pt}
+\centerline{{ACC}}
+\end{minipage}\hspace{5pt}
+\begin{minipage}{0.3\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/tau/01/NMI_tau.pdf}}
+% \vspace{5pt}
+\centerline{{NMI}}
+\end{minipage}\hspace{5pt}
+\begin{minipage}{0.3\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/tau/01/PUR_tau.pdf}}
+% \vspace{5pt}
+\centerline{{PUR}}
+\end{minipage}\hspace{5pt}
+\caption{Sensitive analysis on hyper-parameter $\tau$ on six datasets with 10\% noisy ratio.}
+\label{sen_tau}
+\vspace{-10pt}
+\end{figure*}
+
+\begin{figure*}[]
+\centering
+\small
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/bbc_acc.pdf}}
+{\centerline{BBCSport-ACC}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/bbc_nmi.pdf}}
+{\centerline{BBCSport-NMI}}
+% \centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/bbc_pur.pdf}}
+% {\centerline{BBCSport-PUR}}
+% \centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/cal_acc.pdf}}
+% {\centerline{Caltech101}}
+\end{minipage}
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/webkb_acc.pdf}}
+{\centerline{WebKB-ACC}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/webkb_nmi.pdf}}
+{\centerline{WebKB-NMI}}
+% \centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/webkb_pur.pdf}}
+% {\centerline{WebKB-PUR}}
+% \centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/cal_pur.pdf}}
+% {\centerline{Caltech101-PUR}}
+\end{minipage}
+\begin{minipage}{0.23\linewidth}
+% \centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/re_acc.pdf}}
+% {\centerline{Reuters-ACC}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/re_nmi.pdf}}
+{\centerline{Reuters-NMI}}
+% \centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/re_pur.pdf}}
+% {\centerline{Reuters-PUR}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/cal_nmi.pdf}}
+{\centerline{Caltech101-NMI}}
+\end{minipage}
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/stl_pur.pdf}}
+{\centerline{STL10-PUR}}
+% \centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/stl_acc.pdf}}
+% {\centerline{STL10-ACC}}
+% \centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/stl_nmi.pdf}}
+% {\centerline{STL10-NMI}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/uci_nmi.pdf}}
+{\centerline{UCI-digit-NMI}}
+\end{minipage}
+\caption{Sensitivity Analysis for $\alpha$ and $\beta$ with ACC, NMI, and PUR on BBCSport, WebKB, Reuters, UCI-digits, Caltech101 and STL10 datasets with 10\% noisy ratio.}
+\label{sen_a_b_other}
+\vspace{-13pt}
+\end{figure*}
+
+
+
+\subsection{Hyper-parameter Analysis~\textbf{(RQ4)}}\label{rq4}
+In this subsection, we conduct experiments to analysis the sensitivity of the hyper-parameters in this paper. 
+
+\textbf{Sensitive analysis of trade-off hyper-parameter $\alpha$ and $\beta$:}
+
+To further examine the impact of the parameters $\alpha$ and $\beta$ on our model, we performed sensitive experiments on six datasets with 10\% noise ratio. Specifically, we analyze parameter values within the range of $\{0.01, 0.1, 1.0, 10\}$. According to the results presented in Fig.~\ref{sen_a_b_other}. We could find the following observations. 1) When $\alpha$ and $\beta$ approach extreme values, the model's clustering performance deteriorates significantly. This decline can be attributed to the disruption of the balance in the loss function. We observe that the model achieves optimal clustering performance when the values of $\alpha$ and $\beta$ are set to 1.0. Thus, we set the parameters to 1.0. 2) Compared to changes in $\beta$, variations in $\alpha$ result in more pronounced changes in the model's performance. This indicates that the noisy identification and rectification module contributes more significantly to enhancing performance.
+
+
+
+
+% \begin{itemize}
+%   \item 
+
+%   \item 
+
+% \end{itemize}
+
+
+
+\textbf{Sensitive analysis of threshold $\tau$:}
+
+We conduct experiments to evaluate the influence of the threshold parameter $\tau$. We varied the value of $\tau$ within the range of $\{0.2, 0.4, 0.6, 0.8\}$. The results are demonstrated in Fig.~\ref{sen_tau}. We have the following observation. As the threshold increases, the clustering performance of the model improves progressively. We attribute this to the fact that higher thresholds reduce the number of incorrect contrastive learning sample pairs.
+
+% , thereby enhancing the model's discriminative ability
+% \vspace{-5pt}
+\section{Conclusion}
+
+In this work, we present a novel deep contrastive multi-view clustering network to automatically identify and rectify the noisy data (AIRMVC). In AIRMVC, we first consider the noisy identification as an anomaly identification problem. Then, based on the identification results, we introduce a hybrid rectification strategy to alleviate the adverse impact of noisy data. After that, we design a noise-robust contrastive mechanism to obtain more discriminative representations. Moreover, we theoretical proof that the learned representations could discard the noisy information. Comprehensive experiments conducted on six benchmark datasets validate the effectiveness and robustness of AIRMVC.
+
+ 
+
+\newpage
+
+\section*{Acknowledgments}
+This work was supported by the National Science and Technology Innovation 2030 Major Project under Grant No. 2022ZD0209103, the National Natural Science Foundation of China (project No. 62325604, 62441618, 62476281, U24A20323 and 62276271), and the Program of China Scholarship Council (No. 202406110009). 
+
+\bibliography{main}
+\bibliographystyle{icml2025}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% APPENDIX
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\appendix
+\onecolumn
+\section{Appendix}
+
+\subsection{Notations \& Related Work}
+\subsubsection{Notations}
+
+In this subsection, we provide the notations in Tab.~\ref{notation_table}.
+
+\begin{table}[h]
+\centering
+\caption{Notation Summary in AIRMVC.}
+\begin{tabular}{c|c}
+\hline
+\textbf{Notations} & \textbf{Meaning}                               \\ \hline
+$V$                  & The number of view                             \\
+$N$                  & The number of samples in each view             \\
+$K$                  & The number of class                            \\
+$x^v$                  & The $v$-th input data from multi-view            \\
+\textbf{E}                  & The extracted representations                  \\
+$y$                  & The soft prediction of class probability       \\
+$y'$                & The noisy soft prediction of class probability \\
+$\mathcal{F}^v$                  & The encoder network                            \\
+$\mathcal{G}^v$                   & The decoder network                            \\
+$\Theta^v$                 & The parameters of encoder network              \\
+$\Phi^v$                  & The parameters of decoder network              \\
+$m$                  & The mixed soft prediction of class probability  \\
+$h(\cdot)$                  & The classifier head                            \\
+$\varphi$                  & The clean probability                          \\
+$s(;)$                  & Similarity function                            \\
+$\alpha, \beta$                  & The trade-off hyper-parameters                 \\
+$\mathcal{L}_{rs}$                  & The rectification loss                         \\
+$\mathcal{L}_{con}$                   & The contrastive loss                           \\
+$\mathcal{L}_{rec}$                   & The reconstruction loss                        \\ \hline
+\end{tabular}
+\label{notation_table}
+\end{table}
+
+
+
+\subsubsection{Related Work}
+
+\textbf{{Contrastive Learning:}}
+Contrastive learning~\cite{xihong}, recognized for its ability to extract robust intrinsic supervisory signals, has attracted considerable attention in various fields, e.g., recommender system~\cite{Darec,TTTRec,zhao1, zhao2, dang1, dang2,yin1, yin2,yang1}, graph learning~\cite{DCRN,SCGC,CCGC,MGCN,CONVERT,yu1,yu2, mo1, mo2, huang1,huang2}. The core concept of contrastive learning focuses on maximizing the similarity between positive samples while minimizing the similarity between negative samples within the latent space. Noise Contrastive Estimation (NCE) \cite{nce1,nce2} was introduced, followed by InfoNCE~\cite{infonce}, which aimed at distinguishing different views of a sample in the presence of others. Subsequently, methods like MoCo~\cite{MOCO} and SimCLR~\cite{SIMCLR} have advanced the learning of image-specific features by bringing positive pairs closer and pushing negative pairs further apart. In the realm of multi-view clustering, several contrastive learning approaches have been proposed~\cite{CMC,MVGRL,MFLVC}. For instance, CMC~\cite{CMC} introduced a contrastive multi-view coding framework to extract meaningful semantic information. MVGRL~\cite{MVGRL} utilized a graph diffusion matrix to generate augmented graphs, which were then leveraged to establish a multi-view contrastive mechanism for downstream tasks. 
+
+More recently, MFLVC \cite{MFLVC} proposed two objectives for multi-view clustering using high-level features and pseudo-labels within a contrastive learning framework. DealMVC \cite{DealMVC} introduced a dual-calibration mechanism specifically designed for deep multi-view clustering, with a calibration contrastive loss that effectively differentiates similar yet distinct samples across multiple views. To further enhance the quality of contrastive learning sample pairs, DIVIDE \cite{DIVIDE} adopted a random walk approach to iteratively identify reliable data pairs, thus improving the stability and robustness of contrastive learning in multi-view clustering. CANDY \cite{candy} exploits inter-view similarities as contextual cues to uncover false negatives, while also integrating a spectral-based denoising module to refine correspondence in multi-view settings. Contrastive learning, as a powerful method for improving feature quality, has proven highly effective in the MVC field. In this work, we propose a noise-robust contrastive learning mechanism to enhance the model's performance and robustness in noisy environments.
+
+
+\textbf{{Multi-view Learning:}}
+Recently, Multi-view Clustering (MVC)~\cite{wan1, wan2, dong1,dong2,ysj1, ysj2,ysj3,li1,li2,zheng1} has attracted substantial research interest. Existing MVC approaches can generally be divided into two categories based on cross-view correspondence: MVC with fully aligned data and MVC with partially aligned data. Fully aligned data assumes predefined mapping relationships between every pair of cross-view samples. Several methods have been developed under this assumption, which can be broadly grouped into five main categories: (1) Non-negative matrix factorization-based methods \cite{wenjie_mf}, which aim to discover a shared latent factor to integrate information from multiple views; (2) Kernel learning-based methods \cite{one}, where a predefined set of base kernels is assigned to each view, and the kernel weights are optimally fused to improve clustering performance; (3) Subspace-based methods \cite{suyuan_AAAI}, which assume that all views share a common low-dimensional latent space and derive clustering results by learning this shared representation; (4) Graph-based methods \cite{graph_mvc}, which construct a unified graph from multi-view data and utilize spectral decomposition to obtain clustering outcomes; and (5) Deep learning-based methods \cite{DealMVC}, which leverage the powerful representation capabilities of deep neural networks to capture more complex and robust features for clustering.  
+
+While these methods have shown strong clustering performance, they typically assume that the features of all views are noise-free. In real-world scenarios, however, noise is often present and can significantly degrade their effectiveness. To address the challenge of noisy data, MVCAN \cite{MVCAN} adopts an unshared network structure and introduces a two-level optimization strategy to enhance robustness in noisy settings. Similarly, RMCNC \cite{sun2024robust} incorporates a noise-tolerant contrastive loss to counteract the effects of noise in multi-view data. Despite these advancements, existing methods still lack dedicated strategies for explicitly detecting and correcting noise.  
+
+To bridge this gap, this paper introduces a novel multi-view clustering framework designed to automatically identify and rectify noise. This framework aims to enhance clustering performance and robustness in the presence of real-world noisy data.
+
+
+
+
+\subsection{Proof of Theorem.~\ref{theorem_1}}\label{the_proof}
+In this subsection, we provide the detailed proof of Theorem.~\ref{theorem_1}. 
+% \renewcommand{\thetheorem}{\arabic{theorem}}
+% \setcounter{theorem}{13}
+\begin{theorem}
+The representations ${\textbf{E}^*}$ retain clean information and discard noisy information, which can be presented as:
+\begin{equation}
+\begin{aligned}
+I(x;y)- \vartheta &\le I(\textbf{E}^*;y) \le I(x;y),\\
+I(\textbf{E}^*;y') &\le I(x;y')-\eta + \vartheta.
+\end{aligned}
+\nonumber
+\end{equation} 
+\end{theorem} 
+
+\begin{proof}
+To proof Theorem.~\ref{theorem_1}, we first present the following definitions. 
+
+\begin{definition} [Mutual Information] The mutual information for the representations and input data in multi-view scenario could be expressed as:
+\begin{equation}
+    I(\textbf{E}; x^+) = \int \int p(\textbf{E}, x^+) \text{log}\frac{p(\textbf{E}|x^+)}{p(\textbf{E})}dx^+d\textbf{E}
+\end{equation}
+where $x^+$ is the positive samples for $x$. $\textbf{E}$ is the representations extracted by the encoder network in latent space.
+\end{definition}
+
+\begin{definition} [Relationship for Mutual Information and Representation] The learned representations $\textbf{E}$ by minimizing Eq.~\eqref{contra_loss} maximize the mutual information, i.e., $I(\textbf{E}; x^+)$. 
+\label{define_MR}
+\end{definition}
+In detail, Eq.~\eqref{contra_loss} maximizes the similarity of the positive samples while minimizing the similarity of negative samples. The estimate of $\textbf{E}$ conditioned on $x^+$ is more accurate since $x^+$ is the similar with $x$. Therefore, the mutual information $\text{log}\frac{p(\textbf{E}|x^+)}{p(\textbf{E})}$ will increase by minimizing Eq.~\eqref{contra_loss}. The similar definition is widely adopted in many other fields~\cite{tsai2020self,hjelm2018learning}. Based on Definition.~\ref{define_MR}, we define $\textbf{E}^* = \text{argmax}_{\textbf{E}}I(\textbf{E};x^+)$ to denote the representations by minimizing the contrastive loss, i.e., maximizing the mutual information.
+
+\begin{definition} [Mutual Information Constraint] For the input data $x$, positive samples $x^+$, the clean prediction $y$, and noisy prediction $y'$, we define the mutual information constraint if exists $I(x;y|x^+) \le \vartheta$ and $I(x; y'|x^+) > \eta$.
+\label{MI_const}
+\end{definition}
+Specifically, For the fixed $x$ and its positive samples $x^+$, the information gain for the class prediction $y$ is limited. $\vartheta$ could be interpreted as a small value of the information gain contributed by positive samples $x^+$. In contrast, $x^+$ contributes greater information gain to the noisy prediction $y'$, which we regard as $\eta$.
+
+Based on the above definitions, we present detailed proof. Similar to~\cite{tsai2020self}, the first step is to proof the first inequality. With adopting the Data Processing Inequality~\cite{cover1999elements} in the Markov chain $y \leftrightarrow  x  \to  \textbf{E}$, for any $\textbf{E}$ we have:
+\begin{equation}
+I(x;y)\le I(\textbf{E};y)
+\end{equation}
+Therefore, we conclude $I(x;y)\le I(\textbf{E}^*;y)$. Moreover, the learned representations $\textbf{E}^*$ maximize $I(\textbf{E}; x^+)$ and $I(\textbf{E}^*;x^+)$ is maximized at $I(x;x^+)$, we could obtain:
+\begin{equation}
+\begin{aligned}
+I(\textbf{E}^*;x^+) &= I(x;x^+),\\
+I(\textbf{E}^*;x^*|y) &= I(x;x^+|y)
+\end{aligned}
+\end{equation}
+
+Thus, for distribution $(\textbf{E}^*, x^+, y)$, we have $I(\textbf{E}^*;x^+;y) = I(\textbf{E}^*; x^+) - I(\textbf{E}^*; x^+|y)$. By substitution, we could obtain: 
+\begin{equation}
+\begin{aligned}
+I(\textbf{E}^*;x^+;y) &= I(x;x^+)-I(x;x^+|y)\\
+                      &=I(x;x^+;y)
+\end{aligned}
+\end{equation}
+After that, we have:
+\begin{equation}
+\begin{aligned}
+I(\textbf{E}^*;y) &= I(x;x^+;y) + I(\textbf{E}^*; y|x^+)\\
+&=I(x;y) - I(x;y|x^+) + I(\textbf{E}^*; y|x^+)
+\end{aligned}
+\end{equation}
+Therefore, we have:
+\begin{equation}
+\begin{aligned}
+I(\textbf{E}^*;y) &\le I(x;y),\\
+I(\textbf{E}^*;y) &\ge  I(x;y) - I(x;y|x^+) \ge I(x;y)-\vartheta
+\end{aligned}
+\end{equation}
+
+For the second inequality, we could obtain the following formula by expanding $I(\textbf{E}*, y')$:
+\begin{equation}
+\begin{aligned}
+I(\textbf{E}^*;y') = I(x;y')-I(x;y'|x^+) + I(\textbf{E}^*;y'|x^+)
+\end{aligned}
+\end{equation}
+
+Moreover, with the $\eta$ in Definition.~\ref{MI_const} and the Markov Chain $y' \gets y \leftrightarrow x \to \textbf{E}$, we have:
+\begin{equation}
+\begin{aligned}
+I(\textbf{E}^*;y') &\le I(x;y')-\eta + I(\textbf{E}^*;y'|x^+)\\
+                   &I(x;y')-\eta + I(\textbf{E}^*;y|x^+)\\
+                   &I(x;y')-\eta+\vartheta
+\end{aligned}
+\end{equation}
+
+Therefore, we have completed the proof.
+
+\end{proof}
+
+
+\subsection{Additional Experimental Results}\label{add_exp}
+
+In this section, due to the limitation of the original paper pages, we conduct additional experiments including comparison experiments, sensitive analysis, and visualization analysis experiments.
+
+\subsubsection{Comparison Experiments}
+We employ experiments with five deep multi-view clustering methods, i.e., SiMVC~\cite{SiMVC}, CoMVC~\cite{SiMVC}, MFLVC~\cite{MFLVC}, DealMVC~\cite{DealMVC}, SURE~\cite{SURE}. The results are presented in Tab.~\ref{com_res3},~\ref{com_res4},~\ref{com_res5}. Especially, Tab.~\ref{com_res5} presents the experimental results with 90\% noisy ratio. From those experimental results, we could conclude the following observations.
+
+\begin{itemize}
+    \item AIRMVC consistently outperforms state-of-the-art baselines across various metrics and datasets. Specifically, on the BBCSport dataset with 10\% noise, AIRMVC achieves notable improvements of 2.58\%, 9.94\%, and 2.56\% in ACC, NMI, and PUR, respectively, compared to the best multi-view clustering algorithm. This improvement can be attributed to AIRMVC's ability to automatically identify and rectify noisy data, ensuring a more robust learning process.  
+    \item The presence of noise in multi-view data often destabilizes the performance of deep multi-view clustering models. As the proportion of noise increases, the clustering performance deteriorates. This decline can be explained by the distortion of the underlying clustering structures caused by noisy data.
+\end{itemize}
+
+
+\subsubsection{Ablation Study}\label{other_ab}
+
+
+In this subsection, we conduct experiments to evaluate the effectiveness of the components within AIRMVC. Due to space constraints, we present the experimental results under a 30\% noise ratio.  
+
+We perform ablation studies to validate the contributions of the designed components, including the noisy identification and rectification strategy and the noise-robust contrastive mechanism. Specifically, we use the following notations for the ablation models: ``(w/o) D\&R'' refers to removing the noisy identification and rectification strategy, ``(w/o) Con'' denotes removing the noise-robust contrastive mechanism, and ``(w/o) D\&R\&Con'' indicates the removal of both modules. Additionally, in ``(w/o) D\&R\&Con,'' an autoencoder network is utilized as the backbone to extract representations for downstream clustering tasks. We conduct experiments using three metrics across six datasets, with the results shown in Fig.~\ref{ablation_study_other}. Based on the results, we draw the following observations:  
+
+\begin{itemize}
+    \item Removing any component from the proposed model results in noticeable performance degradation, demonstrating that each module contributes to the overall clustering effectiveness. 
+    \item The removal of the noisy identification and rectification strategy (``(w/o) D\&R'') causes a greater decline in performance than removing the noise-robust contrastive mechanism (``(w/o) Con''), underscoring the critical importance of noise identification and rectification for maintaining robust clustering performance. 
+\end{itemize}
+ 
+
+\begin{figure*}[]
+\centering
+\small
+\begin{minipage}{0.45\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Ablation/01/webkb.pdf}}
+{\centerline{WebKB}}
+\end{minipage}
+\begin{minipage}{0.45\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Ablation/01/uci.pdf}}
+{\centerline{UCI-digit}}
+\end{minipage}
+\caption{Ablation studies on UCI-digit and WebKB datasets with 10\% noisy ratio.}
+\label{ablation_study_10}
+\end{figure*}
+
+\begin{figure*}[]
+\centering
+\small
+% \begin{minipage}{0.23\linewidth}
+% \centerline{\includegraphics[width=1\textwidth]{Figure/Ablation/01/webkb.pdf}}
+% {\centerline{WebKB with 10\%}}
+% \centerline{\includegraphics[width=1\textwidth]{Figure/Ablation/01/uci.pdf}}
+% {\centerline{UCI-digit with 10\%}}
+% \end{minipage}
+\begin{minipage}{0.31\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Ablation/03/bbc_03.pdf}}
+{\centerline{BBCSport}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Ablation/03/webkb_03.pdf}}
+{\centerline{WebKB}}
+\end{minipage}
+\begin{minipage}{0.31\linewidth}
+\centerline{\includegraphics[width=\textwidth]{Figure/Ablation/03/stl10_03.pdf}}
+{\centerline{STL10}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Ablation/03/cal101_03.pdf}}
+{\centerline{Caltech101}}
+\end{minipage}
+\begin{minipage}{0.31\linewidth}
+\centerline{\includegraphics[width=\textwidth]{Figure/Ablation/03/retu_03.pdf}}
+{\centerline{Reuters}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Ablation/03/uci_03.pdf}}
+{\centerline{UCI-digit}}
+\end{minipage}
+\caption{Ablation studies on BBCSport, Caltech101, STL10, UCI-digit, WebKB and Reuters datasets with 30\% noisy ratio.}
+\label{ablation_study_other}
+\end{figure*}
+
+
+
+\subsubsection{Detailed Hyper-parameter Analysis}\label{rq4}
+In this subsection, we conduct detailed experiments to analysis the sensitivity of the hyper-parameter $\alpha$ and $\beta$ in this paper. 
+
+\textbf{Sensitive analysis of trade-off hyper-parameter $\alpha$ and $\beta$:}
+
+To further examine the impact of the parameters $\alpha$ and $\beta$ on our model, we performed sensitive experiments on six datasets with 10\% noise ratio. In particular, we analyze parameter values within the range of $\{0.01, 0.1, 1.0, 10\}$. According to the results presented in Fig. \ref{sen_a_b_all}. We could find the following observations.
+
+\begin{itemize}
+  \item When $\alpha$ and $\beta$ approach extreme values, e.g., $0.01$, the model's clustering performance deteriorates significantly. This decline can be attributed to the disruption of the balance in the loss function. Besides, we could observe that the model achieves optimal clustering performance when the values of $\alpha$ and $\beta$ are set to 1.0. Therefore, we set the balance parameters to 1.0 in our experiments.
+
+  \item Compared to changes in $\beta$, variations in $\alpha$ result in more pronounced changes in the model's performance. This indicates that the noisy identification and rectification module contributes more significantly to enhancing the model's performance.
+
+\end{itemize}
+
+
+
+
+\textbf{Sensitive analysis of threshold $\tau$:}
+
+We conduct experiments to evaluate the influence of the threshold parameter $\tau$. We varied the value of $\tau$ within the range of $\{0.2, 0.4, 0.6, 0.8\}$. The results are demonstrated in Fig.~\ref{sen_tau}. Based on the results, we have the following observation. As the threshold increases, the clustering performance of the model improves progressively. We attribute this to the fact that higher thresholds reduce the number of incorrect contrastive learning sample pairs, thereby enhancing the model's discriminative ability.
+
+
+\begin{figure*}[]
+\centering
+\small
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/bbc_acc.pdf}}
+{\centerline{BBCSport-ACC}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/bbc_nmi.pdf}}
+{\centerline{BBCSport-NMI}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/bbc_pur.pdf}}
+{\centerline{BBCSport-PUR}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/cal_acc.pdf}}
+{\centerline{Caltech101}}
+\end{minipage}
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/webkb_acc.pdf}}
+{\centerline{WebKB-ACC}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/webkb_nmi.pdf}}
+{\centerline{WebKB-NMI}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/webkb_pur.pdf}}
+{\centerline{WebKB-PUR}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Sen/01/cal_pur.pdf}}
+{\centerline{Caltech101-PUR}}
+\end{minipage}
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/re_acc.pdf}}
+{\centerline{Reuters-ACC}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/re_nmi.pdf}}
+{\centerline{Reuters-NMI}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/re_pur.pdf}}
+{\centerline{Reuters-PUR}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/cal_nmi.pdf}}
+{\centerline{Caltech101-NMI}}
+\end{minipage}
+\begin{minipage}{0.23\linewidth}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/stl_pur.pdf}}
+{\centerline{STL10-PUR}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/stl_acc.pdf}}
+{\centerline{STL10-ACC}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/stl_nmi.pdf}}
+{\centerline{STL10-NMI}}
+\centerline{\includegraphics[width=\textwidth]{Figure/Sen/01/uci_nmi.pdf}}
+{\centerline{UCI-digit-NMI}}
+\end{minipage}
+\caption{Sensitivity Analysis for $\alpha$ and $\beta$ with ACC, NMI, and PUR on BBCSport, WebKB, Reuters, Caltech101, UCI-digit, and STL10 datasets with 10\% noisy ratio.}
+\label{sen_a_b_all}
+\end{figure*}
+
+
+
+
+\subsubsection{Visualization Analysis}
+
+To gain deeper insights into the representations learned by AIRMVC, we leverage $t$-SNE~\cite{TSNE} to visualize the latent feature space. Specifically, we extract the representations using the UCI-digit dataset and map them into a lower-dimensional space for visualization. The results, as shown in Fig.~\ref{other_t_sne}, reveal the following observations: as training progresses, the clustering structures in the UCI-digit dataset become progressively more distinct. By the 200th epoch, well-separated and identifiable cluster structures are observed. These results highlight the effectiveness of AIRMVC in uncovering the intrinsic cluster structures of the data.   
+
+
+\begin{figure*}[h]
+\centering
+\begin{minipage}{0.19\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_20.png}}
+\vspace{5pt}
+\centerline{{20 Epoch}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_120.png}}
+\vspace{5pt}
+\centerline{{120 Epoch}}
+\end{minipage}\hspace{3pt}
+\begin{minipage}{0.19\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_40.png}}
+\vspace{5pt}
+\centerline{{40 Epoch}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_140.png}}
+\vspace{5pt}
+\centerline{{140 Epoch}}
+\end{minipage}\hspace{3pt}
+\begin{minipage}{0.19\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_60.png}}
+\vspace{5pt}
+\centerline{{60 Epoch}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_160.png}}
+\vspace{5pt}
+\centerline{{160 Epoch}}
+\end{minipage}\hspace{3pt}
+\begin{minipage}{0.19\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_80.png}}
+\vspace{5pt}
+\centerline{{80 Epoch}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_180.png}}
+\vspace{5pt}
+\centerline{{180 Epoch}}
+\end{minipage}\hspace{3pt}
+\begin{minipage}{0.19\linewidth}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_100.png}}
+\vspace{5pt}
+\centerline{{100 Epoch}}
+\centerline{\includegraphics[width=1\textwidth]{Figure/Vis/vis_200.png}}
+\vspace{5pt}
+\centerline{{200 Epoch}}
+\end{minipage}\hspace{3pt}
+\caption{Visualization of the representations during the training process on UCI-digit dataset.}
+\label{other_t_sne}
+\end{figure*}
+
+
+\begin{table*}[]
+\centering
+\caption{Multi-view clustering performance on six benchmark datasets (Part 3/4). The highest performance metrics are emphasized in \textcolor{red}{\textbf{red}}, while the runner-up results are marked in \textcolor{blue}{blue}.}
+\scalebox{0.78}{
+\begin{tabular}{c|cc|ccc|ccc|ccc|ccc}
+\hline
+                            & \multicolumn{2}{c|}{\textbf{Noisy Rate}}                     & \multicolumn{3}{c|}{\textbf{10\%}}                                                                                     & \multicolumn{3}{c|}{\textbf{30\%}}                                                                                     & \multicolumn{3}{c|}{\textbf{50\%}}                                                                                     & \multicolumn{3}{c}{\textbf{70\%}}                                                                                      \\ \cline{2-15} 
+\multirow{-2}{*}{\textbf{}} & \multicolumn{2}{c|}{\textbf{Metric}}                         & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{SiMVC}}   & \textbf{CVPR 2021}   & 42.83                                 & 11.90                                 & {\color[HTML]{3531FF} 46.88}          & 39.52                                 & 12.48                                 & {\color[HTML]{3531FF} 41.54}          & 35.29                                 & 11.02                                 & {\color[HTML]{3531FF} 40.07}          & 32.35                                 & 05.09                                 & 36.76                                 \\
+                            & \multicolumn{1}{c|}{\textbf{CoMVC}}   & \textbf{CVPR 2021}   & 39.71                                 & 05.38                                 & 40.62                                 & 37.50                                 & 04.03                                 & 37.13                                 & 35.48                                 & 02.13                                 & 35.85                                 & 32.17                                 & 01.62                                 & 35.48                                 \\
+                            & \multicolumn{1}{c|}{\textbf{MFLVC}}   & \textbf{CVPR 2022}   & {\color[HTML]{3531FF} 46.87}          & {\color[HTML]{3531FF} 18.69}          & 46.87                                 & {\color[HTML]{3531FF} 44.12}          & {\color[HTML]{3531FF} 15.49}          & 44.12                                 & {\color[HTML]{3531FF} 40.51}          & {\color[HTML]{3531FF} 14.44}          & 40.51                                 & {\color[HTML]{3531FF} 39.15}          & {\color[HTML]{3531FF} 12.18}          & {\color[HTML]{3531FF} 40.43}          \\
+                            & \multicolumn{1}{c|}{\textbf{DealMVC}} & \textbf{ACM MM 2023} & 40.25                                 & 07.56                                 & 40.44                                 & 35.48                                 & 06.27                                 & 35.48                                 & 31.80                                 & 03.94                                 & 35.47                                 & 30.38                                 & 02.89                                 & 31.78                                 \\
+                            & \multicolumn{1}{c|}{\textbf{SURE}}    & \textbf{TPAMI 2023}  & 35.26                                 & 12.80                                 & 37.24                                 & 32.35                                 & 10.27                                 & 36.51                                 & 31.55                                 & 08.23                                 & 36.47                                 & 29.27                                 & 06.84                                 & 26.31                                 \\
+\multirow{-6}{*}{\rotatebox{90}{\textbf{BBCSport}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}        & {\color[HTML]{FF0000} \textbf{49.45}} & {\color[HTML]{FF0000} \textbf{28.63}} & {\color[HTML]{FF0000} \textbf{49.44}} & {\color[HTML]{FF0000} \textbf{45.59}} & {\color[HTML]{FF0000} \textbf{20.11}} & {\color[HTML]{FF0000} \textbf{47.24}} & {\color[HTML]{FF0000} \textbf{45.04}} & {\color[HTML]{FF0000} \textbf{23.34}} & {\color[HTML]{FF0000} \textbf{53.13}} & {\color[HTML]{FF0000} \textbf{40.99}} & {\color[HTML]{FF0000} \textbf{16.52}} & {\color[HTML]{FF0000} \textbf{45.59}} \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{SiMVC}}   & \textbf{CVPR 2021}   & 77.26                                 & 13.72                                 & 69.82                                 & 62.04                                 & {\color[HTML]{3531FF} 10.99}          & {\color[HTML]{3531FF} 65.19}          & 60.61                                 & {\color[HTML]{3531FF} 08.00}          & {\color[HTML]{3531FF} 63.71}          & 55.00                                 & {\color[HTML]{FF0000} \textbf{06.80}}           & 56.43                                 \\
+                            & \multicolumn{1}{c|}{\textbf{CoMVC}}   & \textbf{CVPR 2021}   & 77.74                                 & 10.62                                 & 69.80                                 & {\color[HTML]{3531FF} 66.89}          & 08.10                                 & 64.58                                 & 56.23                                 & 07.27                                 & 58.12                                 & 54.42                                 & 05.17                                 & 55.28                                 \\
+                            & \multicolumn{1}{c|}{\textbf{MFLVC}}   & \textbf{CVPR 2022}   & {\color[HTML]{3531FF} 77.83}          & {\color[HTML]{3531FF} 19.56}          & {\color[HTML]{3531FF} 78.12}          & 64.61                                 & 09.42                                 & 64.53                                 & {\color[HTML]{3531FF} 62.13}          & 07.43                                 & 62.13                                 & {\color[HTML]{3531FF} 58.61}          & 03.07                                 & {\color[HTML]{3531FF} 58.61}          \\
+                            & \multicolumn{1}{c|}{\textbf{DealMVC}} & \textbf{ACM MM 2023} & 66.03                                 & 15.02                                 & 65.27                                 & 60.32                                 & 04.85                                 & 60.32                                 & 59.66                                 & 04.63                                 & 58.47                                 & 55.57                                 & 01.92                                 & 55.57                                 \\
+                            & \multicolumn{1}{c|}{\textbf{SURE}}    & \textbf{TPAMI 2023}  & 67.27                                 & 11.10                                 & 67.11                                 & 62.55                                 & 7.80                                  & 63.05                                 & 55.77                                 & 06.12                                 & 58.92                                 & 53.91                                 & 05.80                                 & 57.71                                 \\
+\multirow{-7}{*}{\rotatebox{90}{\textbf{WebKB}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}         & {\color[HTML]{FF0000} \textbf{83.73}} & {\color[HTML]{FF0000} \textbf{27.15}} & {\color[HTML]{FF0000} \textbf{83.73}} & {\color[HTML]{FF0000} \textbf{77.93}} & {\color[HTML]{FF0000} \textbf{13.48}} & {\color[HTML]{FF0000} \textbf{78.12}} & {\color[HTML]{FF0000} \textbf{74.98}} & {\color[HTML]{FF0000} \textbf{08.42}} & {\color[HTML]{FF0000} \textbf{74.98}} & {\color[HTML]{FF0000} \textbf{62.89}} & {\color[HTML]{3531FF} {06.69}} & {\color[HTML]{FF0000} \textbf{62.32}} \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{SiMVC}}   & \textbf{CVPR 2021}   & 25.83                                 & 07.80                                 & 26.67                                 & 22.50                                 & 04.69                                 & 22.67                                 & 19.17                                 & 04.12                                 & 19.17                                 & 17.75                                 & 01.83                                 & 17.92                                 \\
+                            & \multicolumn{1}{c|}{\textbf{CoMVC}}   & \textbf{CVPR 2021}   & 25.92                                 & 06.35                                 & 24.50                                 & 22.67                                 & 05.47                                 & 22.67                                 & 19.75                                 & 02.92                                 & 19.75                                 & 18.25                                 & 01.93                                 & 18.25                                 \\
+                            & \multicolumn{1}{c|}{\textbf{MFLVC}}   & \textbf{CVPR 2022}   & {\color[HTML]{3531FF} 34.92}          & {\color[HTML]{3531FF} 21.24}          & {\color[HTML]{3531FF} 36.00}          & {\color[HTML]{3531FF} 31.08}          & {\color[HTML]{3531FF} 17.94}          & {\color[HTML]{3531FF} 29.50}          & {\color[HTML]{3531FF} 29.91}          & {\color[HTML]{3531FF} 15.77}          & {\color[HTML]{3531FF} 30.33}          & {\color[HTML]{3531FF} 27.42}          & {\color[HTML]{3531FF} 12.07}          & {\color[HTML]{3531FF} 27.42}          \\
+                            & \multicolumn{1}{c|}{\textbf{DealMVC}} & \textbf{ACM MM 2023} & 30.92                                 & 14.14                                 & 30.92                                 & 28.50                                 & 10.53                                 & 28.50                                 & 27.92                                 & 06.16                                 & 27.92                                 & 26.58                                 & 05.74                                 & 26.58                                 \\
+                            & \multicolumn{1}{c|}{\textbf{SURE}}    & \textbf{TPAMI 2023}  & 28.35                                 & 07.13                                 & 28.90                                 & 25.58                                 & 06.14                                 & 26.18                                 & 24.57                                 & 04.63                                 & 25.23                                 & 23.07                                 & 03.43                                 & 23.27                                 \\
+\multirow{-6}{*}{\rotatebox{90}{\textbf{Reuters}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}        & {\color[HTML]{FF0000} \textbf{48.25}}                       & {\color[HTML]{FF0000} \textbf{26.34}}                        & {\color[HTML]{FF0000} \textbf{48.25}}                        & {\color[HTML]{FF0000} \textbf{46.67}}                        & {\color[HTML]{FF0000} \textbf{23.54}}                        & {\color[HTML]{FF0000} \textbf{46.67}}                        & {\color[HTML]{FF0000} \textbf{44.83}}                        & {\color[HTML]{FF0000} \textbf{21.72}}                        & {\color[HTML]{FF0000} \textbf{45.58}}                        & {\color[HTML]{FF0000} \textbf{41.75}}                        & {\color[HTML]{FF0000} \textbf{20.91}}                         & {\color[HTML]{FF0000} \textbf{42.33}}                         \\ \hline
+\end{tabular}}
+\label{com_res3}
+\end{table*}
+
+
+
+\subsection{Setting Details of AIRMVC}
+
+\textbf{Hyper-parameter Settings in our AIRMVC:} 
+
+In this subsection, we report the statistics summary and hyper-parameter settings of our proposed method in Tab.~\ref{hyper-para}.
+
+
+\begin{table}[h]
+\centering
+\caption{Hyper-parameters Statistics in AIRMVC.}
+\begin{tabular}{c|cccccc}
+\hline
+\textbf{}              & \textbf{BBCSport} & \textbf{WebKB} & \textbf{Reuters} & \textbf{UCI-digit} & \textbf{Caltech101} & \textbf{STL10} \\ \hline
+\textbf{Views}         & 2                 & 2              & 5                & 3                  & 5                   & 4              \\
+\textbf{Samples}       & 544               & 1051           & 1200             & 2000               & 9144                & 13000          \\
+\textbf{Clusters}      & 5                 & 2              & 6                & 10                 & 102                 & 10             \\ \hline
+\textbf{Learning Rate} & 1e-4              & 1e-4           & 1e-5             & 1e-4               & 1e-4                & 1e-4           \\
+$\tau$                   & 0.8               & 0.8            & 0.8              & 0.8                & 0.8                 & 0.8            \\
+$\alpha$                 & 1.0               & 1.0            & 1.0              & 1.0                & 1.0                 & 1.0            \\
+$\beta$                  & 1.0               & 1.0            & 1.0              & 1.0                & 1.0                 & 1.0            \\ \hline
+\end{tabular}
+\label{hyper-para}
+\end{table}
+
+
+\begin{table*}[]
+\centering
+\caption{Multi-view clustering performance on six benchmark datasets (Part 4/4). The highest performance metrics are emphasized in \textcolor{red}{\textbf{red}}, while the runner-up results are marked in \textcolor{blue}{blue}.}
+\scalebox{0.78}{
+\begin{tabular}{c|cc|ccc|ccc|ccc|ccc}
+\hline
+                            & \multicolumn{2}{c|}{\textbf{Noisy Rate}}                     & \multicolumn{3}{c|}{\textbf{10\%}}                                                                                     & \multicolumn{3}{c|}{\textbf{30\%}}                                                                                     & \multicolumn{3}{c|}{\textbf{50\%}}                                                                                     & \multicolumn{3}{c}{\textbf{70\%}}                                                                                      \\ \cline{2-15} 
+\multirow{-2}{*}{\textbf{}} & \multicolumn{2}{c|}{\textbf{Metric}}                         & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{SiMVC}}   & \textbf{CVPR 2021}   & 30.50                                 & 30.14                                 & 31.10                                 & 26.50                                 & 19.00                                 & 26.50                                 & 23.45                                 & 18.01                                 & 23.70                                 & 19.95                                 & 11.80                                 & 20.00                                 \\
+                            & \multicolumn{1}{c|}{\textbf{CoMVC}}   & \textbf{CVPR 2021}   & 44.80                                 & 42.42                                 & 45.10                                 & 34.60                                 & 33.58                                 & 34.85                                 & 32.20                                 & 31.31                                 & 32.55                                 & 28.45                                 & 27.00                                 & 29.45                                 \\
+                            & \multicolumn{1}{c|}{\textbf{MFLVC}}   & \textbf{CVPR 2022}   & {\color[HTML]{3531FF} 89.80}          & {\color[HTML]{3531FF} 82.37}          & {\color[HTML]{3531FF} 89.80}          & 60.50                                 & 63.35                                 & 60.50                                 & 47.05                                 & 48.91                                 & 47.05                                 & 31.90                                 & 28.14                                 & 31.90                                 \\
+                            & \multicolumn{1}{c|}{\textbf{DealMVC}} & \textbf{ACM MM 2023} & 84.85                                 & 80.98                                 & 84.85                                 & {\color[HTML]{3531FF} 70.80}          & {\color[HTML]{3531FF} 67.38}          & {\color[HTML]{3531FF} 70.80}          & {\color[HTML]{3531FF} 65.55}          & {\color[HTML]{3531FF} 62.12}          & {\color[HTML]{3531FF} 65.55}          & {\color[HTML]{3531FF} 48.90}          & {\color[HTML]{3531FF} 49.82}          & {\color[HTML]{3531FF} 48.90}          \\
+                            & \multicolumn{1}{c|}{\textbf{SURE}}    & \textbf{TPAMI 2023}  & 34.96                                 & 14.82                                 & 34.96                                 & 31.73                                 & 13.49                                 & 33.29                                 & 28.29                                 & 11.96                                 & 29.35                                 & 26.14                                 & 10.08                                 & 27.05                                 \\
+\multirow{-6}{*}{\rotatebox{90}{\textbf{UCI-digit}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}        & {\color[HTML]{FF0000} \textbf{93.95}} & {\color[HTML]{FF0000} \textbf{89.08}} & {\color[HTML]{FF0000} \textbf{93.95}} & {\color[HTML]{FF0000} \textbf{77.60}} & {\color[HTML]{FF0000} \textbf{76.65}} & {\color[HTML]{FF0000} \textbf{80.75}} & {\color[HTML]{FF0000} \textbf{76.05}} & {\color[HTML]{FF0000} \textbf{68.17}} & {\color[HTML]{FF0000} \textbf{76.05}} & {\color[HTML]{FF0000} \textbf{69.20}} & {\color[HTML]{FF0000} \textbf{60.38}} & {\color[HTML]{FF0000} \textbf{69.20}} \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{SiMVC}}   & \textbf{CVPR 2021}   & 14.88                                 & 10.98                                 & 16.28                                 & 11.72                                 & 6.55                                  & 12.98                                 & 10.79                                 & 5.57                                  & 11.94                                 & 9.63                                  & 5.05                                  & {\color[HTML]{3531FF} 10.97}          \\
+                            & \multicolumn{1}{c|}{\textbf{CoMVC}}   & \textbf{CVPR 2021}   & 15.00                                 & 12.92                                 & 15.80                                 & 14.34                                 & 12.26                                 & 15.49                                 & 10.04                                 & 11.66                                 & 10.42                                 & 9.58                                  & 6.53                                  & 9.95                                  \\
+                            & \multicolumn{1}{c|}{\textbf{MFLVC}}   & \textbf{CVPR 2022}   & 19.63                                 & 20.27                                 & 21.78                                 & {\color[HTML]{3531FF} 14.87}          & {\color[HTML]{3531FF} 16.52}          & 14.33                                 & {\color[HTML]{3531FF} 10.59}          & {\color[HTML]{3531FF} 13.76}          & 10.79                                 & 9.60                                  & 6.80                                  & 9.63                                  \\
+                            & \multicolumn{1}{c|}{\textbf{DealMVC}} & \textbf{ACM MM 2023} & {\color[HTML]{3531FF} 19.90}          & {\color[HTML]{3531FF} 20.73}          & {\color[HTML]{3531FF} 22.07}          & 13.09                                 & 11.96                                 & {\color[HTML]{3531FF} 17.80}          & 10.14                                 & 5.55                                  & 10.14                                 & {\color[HTML]{3531FF} 10.05}          & 5.03                                  & 10.08                                 \\
+                            & \multicolumn{1}{c|}{\textbf{SURE}}    & \textbf{TPAMI 2023}  & 7.44                                  & 17.91                                 & 16.29                                 & 7.09                                  & 15.85                                 & 16.03                                 & 6.84                                  & 14.57                                 & {\color[HTML]{3531FF} 15.01}          & 6.33                                  & {\color[HTML]{3531FF} 12.58}          & 10.62                                 \\
+\multirow{-6}{*}{\rotatebox{90}{\textbf{Caltech101}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}        & {\color[HTML]{FF0000} \textbf{21.45}}                        & {\color[HTML]{FF0000} \textbf{37.16}}                        & {\color[HTML]{FF0000} \textbf{34.69}}                        & {\color[HTML]{FF0000} \textbf{15.89}}                        & {\color[HTML]{FF0000} \textbf{29.39}}                        & {\color[HTML]{FF0000} \textbf{27.60}}                        & {\color[HTML]{FF0000} \textbf{11.80}}                        & {\color[HTML]{FF0000} \textbf{23.66}}                        & {\color[HTML]{FF0000} \textbf{23.33}}                        & {\color[HTML]{FF0000} \textbf{11.89}}                        & {\color[HTML]{FF0000} \textbf{21.14}}                        & {\color[HTML]{FF0000} \textbf{20.14}}                        \\ \hline
+                            & \multicolumn{1}{c|}{\textbf{SiMVC}}   & \textbf{CVPR 2021}   & 19.51                                 & 11.33                                 & 19.52                                 & 17.52                                 & 6.83                                  & 18.06                                 & 15.91                                 & 5.45                                  & 16.04                                 & 13.44                                 & 3.62                                  & 14.00                                 \\
+                            & \multicolumn{1}{c|}{\textbf{CoMVC}}   & \textbf{CVPR 2021}   & {\color[HTML]{3531FF} 27.07}          & 21.49                                 & {\color[HTML]{3531FF} 27.36}          & 20.78                                 & 15.57                                 & 20.70                                 & 17.68                                 & 16.15                                 & 17.75                                 & 15.37                                 & 13.92                                 & 15.56                                 \\
+                            & \multicolumn{1}{c|}{\textbf{MFLVC}}   & \textbf{CVPR 2022}   & 24.39                                 & 23.34                                 & 24.39                                 & 21.14                                 & 20.19                                 & {\color[HTML]{3531FF} 21.47}          & {\color[HTML]{3531FF} 20.58}          & {\color[HTML]{3531FF} 21.92}          & 20.14                                 & 19.08                                 & 18.24                                 & 19.08                                 \\
+                            & \multicolumn{1}{c|}{\textbf{DealMVC}} & \textbf{ACM MM 2023} & 24.59                                 & {\color[HTML]{3531FF} 23.51}          & 24.59                                 & {\color[HTML]{3531FF} 21.23}          & {\color[HTML]{3531FF} 22.83}          & 21.33                                 & 20.56                                 & 21.78                                 & {\color[HTML]{3531FF} 20.56}          & {\color[HTML]{3531FF} 19.12}          & {\color[HTML]{3531FF} 18.27}          & {\color[HTML]{3531FF} 19.12}          \\
+                            & \multicolumn{1}{c|}{\textbf{SURE}}    & \textbf{TPAMI 2023}  & 21.14                                 & 6.72                                  & 21.66                                 & 19.36                                 & 5.87                                  & 20.76                                 & 18.34                                 & 5.64                                  & 19.11                                 & 17.33                                 & 5.45                                  & 18.15                                 \\
+\multirow{-6}{*}{\rotatebox{90}{\textbf{STL10}}}         & \multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}        & {\color[HTML]{FF0000} \textbf{28.81}}                        & {\color[HTML]{FF0000} \textbf{25.04}}                        & {\color[HTML]{FF0000} \textbf{29.01}}                        & {\color[HTML]{FF0000} \textbf{22.46}}                        & {\color[HTML]{FF0000} \textbf{23.64}}                        & {\color[HTML]{FF0000} \textbf{22.46}}                        & {\color[HTML]{FF0000} \textbf{21.95}}                        & {\color[HTML]{FF0000} \textbf{23.09}}                        & {\color[HTML]{FF0000} \textbf{22.02}}                        & {\color[HTML]{FF0000} \textbf{20.14}}                        & {\color[HTML]{FF0000} \textbf{22.66}}                        & {\color[HTML]{FF0000} \textbf{20.14}}                        \\ \hline
+\end{tabular}}
+\label{com_res4}
+\end{table*}
+
+
+
+
+
+
+\textbf{Detailed information about the datasets:}
+
+\begin{itemize}
+\item BBCSport\footnote{\url{http://mlg.ucd.ie/datasets/bbc.html}}: The BBCSport dataset includes 544 sports news articles categorized into five classes: athletics, cricket, football, rugby, and tennis. Each document is described from three different views with dimensions of 2582, 2544, and 2465. This dataset is essential for research in multi-view learning, text classification, and natural language processing, offering a robust foundation for developing and evaluating advanced algorithms.
+
+
+\item Reuters\footnote{\url{http://archive.ics.uci.edu/dataset/137/reuters+21578+text+categorization+collection}}: Reuters is a collection of documents. It contains 1200 samples, which can be divided into 5 classes. This dataset is widely used for text classification, information retrieval, and topic modeling, serving as a benchmark for machine learning. It also aids educational purposes by providing a real-world example for hands-on practice in data analysis and model development, significantly advancing the understanding and solutions for text classification challenges.
+
+
+\item UCI-digit\footnote{\url{https://cs.nyu.edu/∼roweis/data.html}}: The UCI-digit Dataset, also known as the Optical Recognition of Handwritten Digits, contains handwritten digit images (0-9) represented as 8x8 grayscale matrices, resulting in 64 features per image. Each image is labeled with the corresponding digit. This dataset is widely used in academic research for evaluating machine learning models in image recognition and classification, making it an invaluable resource for advancing pattern recognition and computer vision methodologies.
+
+
+\item WebKB\footnote{\url{https://lig-membres.imag.fr/grimal/data.html}}: The WebKB dataset features web pages from four Wisconsin universities, focusing on both the content and the links between them. This dual-aspect dataset is ideal for research in web mining, hyperlink analysis, and multi-view learning, providing a comprehensive resource for developing and evaluating algorithms that explore relationships and content dynamics in academic web environments.
+
+\item SUNRGBD\footnote{\url{https://rgbd.cs.princeton.edu/}}: The SUNRGBD dataset, essential for indoor scene understanding, contains 10,335 samples across 45 categories, including RGB images, depth images, and 3D point cloud data. Each sample has detailed semantic annotations, covering object categories and spatial locations. This multi-modal dataset supports tasks like scene understanding, object detection, semantic segmentation, and 3D reconstruction. Researchers use SUNRGBD to develop and evaluate algorithms that integrate multi-modal information, advancing indoor scene analysis and computer vision research.
+
+\item STL10\footnote{\url{https://cs.stanford.edu/~acoates/stl10/}}: The STL10 dataset is a key benchmark for unsupervised feature learning, deep learning, and self-taught learning. It contains 13,000 labeled images across 10 classes and 100,000 unlabeled images, each at 96x96 pixels with four views per image. This dataset enables model pre-training on unlabeled data, simulating real-world scenarios, and is crucial for evaluating feature learning and generalization capabilities, advancing representation learning and machine learning research.
+
+
+% ALGORITHM
+\begin{algorithm}[]
+\small
+\caption{Training Algorithm of our designed AIRMVC}
+\label{ALGORITHM}
+\flushleft{\textbf{Input}: The multi-view dataset $\{x^v\}_{v=1}^V$}; the epochs $e$; batch size $B$ \\
+\flushleft{\textbf{Output}: The clustering result \textbf{R}.} 
+\begin{algorithmic}[1]
+\FOR{$1$ to $e$}
+\STATE \textbf{E-Step:} update the parameters $\left \{ (\mu_k,\sigma _k) \right \}_{k=1}^K$ in AIRMVC and the $\left \{ \varphi_i \right \}_{i=1}^N$
+\STATE \textbf{M-Step:} 
+\REPEAT
+\STATE Obtain the representations $\textbf{E}$ by the encoder network.
+\STATE Identify the noisy data with Eq.~\eqref{two-GMM}.
+\STATE Rectify the noisy data with Eq.~\eqref{correct}.
+\STATE Calculate the rectification loss, contrastive loss, reconstruction loss with Eq.~\eqref{rectifi_loss},~\eqref{robu_loss}, ~\eqref{rec_loss}.
+\STATE Calculate the total loss $\mathcal{L}$ by Eq.\eqref{total_loss}.
+\STATE Update model by minimizing $\mathcal{L}$ with Adam optimizer.
+\UNTIL{the epoch finishes}
+\ENDFOR
+\STATE \textbf{Output} The clustering results \textbf{R}.
+\end{algorithmic}
+\label{Algo}
+\end{algorithm}
+
+\begin{table*}[]
+\centering
+\caption{Multi-view clustering performance on six benchmark datasets with 90\% noise ratio. The highest performance metrics are emphasized in \textcolor{red}{\textbf{red}}, while the runner-up results are marked in \textcolor{blue}{blue}.}
+\scalebox{0.95}{
+\begin{tabular}{cc|ccc|ccc|ccc}
+\hline
+\multicolumn{2}{c|}{\textbf{Dataset}}                         & \multicolumn{3}{c|}{\textbf{BBCSport}}                                                                                & \multicolumn{3}{c|}{\textbf{WebKB}}                                                                                   & \multicolumn{3}{c}{\textbf{Reuters}}                                                                                  \\ \hline
+\multicolumn{2}{c|}{\textbf{Metrics}}                         & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          \\ \hline
+\multicolumn{1}{c|}{\textbf{SiMVC}}   & \textbf{CVPR 2021}    & 29.78                                 & 04.15                                 & 35.85                                 & 52.43                                 & {\color[HTML]{3531FF} 04.60}          & 56.47                                 & 16.92                                 & 01.08                                 & 17.00                                 \\
+\multicolumn{1}{c|}{\textbf{CoMVC}}   & \textbf{CVPR 2021}    & 30.33                                 & 01.59                                 & 32.75                                 & 51.67                                 & 03.85                                 & 50.15                                 & 16.67                                 & 01.41                                 & 16.67                                 \\
+\multicolumn{1}{c|}{\textbf{MFLVC}}   & \textbf{CVPR 2022}    & 37.13                                 & 07.14                                 & 32.52                                 & 56.14                                 & 01.68                                 & 56.14                                 & 21.33                                 & 04.35                                 & 21.33                                 \\
+\multicolumn{1}{c|}{\textbf{DealMVC}} & \textbf{ACM MM 2023}  & 29.78                                 & 02.76                                 & 30.47                                 & 50.77                                 & 01.28                                 & 50.77                                 & 20.87                                 & 03.58                                 & 20.87                                 \\
+\multicolumn{1}{c|}{\textbf{SURE}}    & \textbf{TPAMI 2023}   & 28.20                                 & 03.13                                 & 24.26                                 & 52.98                                 & 04.20                                 & 56.61                                 & 21.18                                 & 02.82                                 & 21.75                                 \\
+\multicolumn{1}{c|}{\textbf{CANDY}}   & \textbf{NeurIPS 2024} & 15.26                                 & 01.42                                 & 33.48                                 & 14.27                                 & 02.39                                 & 14.27                                 & 17.84                                 & 04.70                                 & 26.50                                 \\
+\multicolumn{1}{c|}{\textbf{RMCNC}}   & \textbf{TKDE 2024}    & 23.90                                 & 03.78                                 & 23.87                                 & 51.87                                 & 03.47                                 & 50.48                                 & 20.17                                 & 05.23                                 & 20.25                                 \\
+\multicolumn{1}{c|}{\textbf{TGM-MVC}} & \textbf{ACM MM 2024}  & 17.38                                 & 03.57                                 & 17.38                                 & 50.24                                 & 05.21                                 & 50.24                                 & 20.58                                 & 03.87                                 & 20.58                                 \\
+\multicolumn{1}{c|}{\textbf{SCE-MVC}} & \textbf{NeurIPS 2024} & {\color[HTML]{3531FF} 37.62}          & {\color[HTML]{3531FF} 08.47}          & 37.28                                 & 51.67                                 & 01.20                                 & 51.67                                 & 16.67                                 & 04.76                                 & 16.67                                 \\
+\multicolumn{1}{c|}{\textbf{MVCAN}}   & \textbf{CVPR 2024}    & 23.34                                 & 01.79                                 & 24.68                                 & {\color[HTML]{3531FF} 57.71}          & 03.05                                 & {\color[HTML]{3531FF} 57.15}          & 19.41                                 & 04.97                                 & 19.83                                 \\
+\multicolumn{1}{c|}{\textbf{DIVIDE}}  & \textbf{AAAI 2024}    & 26.29                                 & 02.04                                 & {\color[HTML]{3531FF} 37.32}          & 50.05                                 & 03.70                                 & 54.34                                 & {\color[HTML]{3531FF} 24.08}          & {\color[HTML]{3531FF} 06.25}          & {\color[HTML]{3531FF} 26.42}          \\ \hline
+\multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}         & {\color[HTML]{FE0000} \textbf{39.52}} & {\color[HTML]{FE0000} \textbf{09.33}} & {\color[HTML]{FE0000} \textbf{40.26}} & {\color[HTML]{FE0000} \textbf{59.18}} & {\color[HTML]{FE0000} \textbf{05.36}} & {\color[HTML]{FE0000} \textbf{60.08}} & {\color[HTML]{FE0000} \textbf{33.50}} & {\color[HTML]{FE0000} \textbf{20.60}} & {\color[HTML]{FE0000} \textbf{35.35}} \\ \hline
+\multicolumn{2}{c|}{\textbf{Dataset}}                         & \multicolumn{3}{c|}{\textbf{UCI-digit}}                                                                               & \multicolumn{3}{c|}{\textbf{Caltech101}}                                                                              & \multicolumn{3}{c}{\textbf{STL10}}                                                                                    \\ \hline
+\multicolumn{2}{c|}{\textbf{Metrics}}                         & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          & \textbf{ACC$\uparrow$}                          & \textbf{NMI$\uparrow$}                          & \textbf{PUR$\uparrow$}                          \\ \hline
+\multicolumn{1}{c|}{\textbf{SiMVC}}   & \textbf{CVPR 2021}    & 15.55                                 & 08.64                                 & 16.00                                 & 07.78                                 & 03.16                                 & 09.61                                 & 11.72                                 & 01.71                                 & 12.66                                 \\
+\multicolumn{1}{c|}{\textbf{CoMVC}}   & \textbf{CVPR 2021}    & 24.15                                 & 26.41                                 & 26.95                                 & 08.61                                 & 05.55                                 & 10.56                                 & 12.63                                 & 08.21                                 & 12.75                                 \\
+\multicolumn{1}{c|}{\textbf{MFLVC}}   & \textbf{CVPR 2022}    & 29.25                                 & 29.18                                 & 29.25                                 & 08.43                                 & 05.29                                 & 08.98                                 & 18.04                                 & 13.93                                 & 18.04                                 \\
+\multicolumn{1}{c|}{\textbf{DealMVC}} & \textbf{ACM MM 2023}  & 37.40                                 & 39.04                                 & 37.45                                 & 09.96                                 & 04.03                                 & 09.38                                 & {\color[HTML]{3531FF} 18.45}          & 17.32                                 & 18.45                                 \\
+\multicolumn{1}{c|}{\textbf{SURE}}    & \textbf{TPAMI 2023}   & 23.92                                 & 08.83                                 & 25.13                                 & 06.21                                 & 10.41                                 & 06.85                                 & 16.93                                 & 04.97                                 & 17.59                                 \\
+\multicolumn{1}{c|}{\textbf{CANDY}}   & \textbf{NeurIPS 2024} & 51.05                                 & 42.16                                 & 53.70                                 & 10.00                                 & 10.60                                 & 16.56                                 & 16.32                                 & 15.44                                 & 16.72                                 \\
+\multicolumn{1}{c|}{\textbf{RMCNC}}   & \textbf{TKDE 2024}    & 19.15                                 & 08.81                                 & 21.15                                 & 06.56                                 & 10.89                                 & 06.10                                 & 13.35                                 & 01.26                                 & 13.57                                 \\
+\multicolumn{1}{c|}{\textbf{TGM-MVC}} & \textbf{ACM MM 2024}  & 49.83                                 & 63.42                                 & 55.59                                 & 05.45                                 & 17.53                                 & 16.21                                 & 17.74                                 & {\color[HTML]{3531FF} 15.66}          & 17.24                                 \\
+\multicolumn{1}{c|}{\textbf{SCE-MVC}} & \textbf{NeurIPS 2024} & 57.70                                 & 49.43                                 & 57.15                                 & {\color[HTML]{3531FF} 10.08}          & {\color[HTML]{3531FF} 18.16}          & {\color[HTML]{3531FF} 18.41}          & 13.85                                 & 10.93                                 & 13.59                                 \\
+\multicolumn{1}{c|}{\textbf{MVCAN}}   & \textbf{CVPR 2024}    & {\color[HTML]{3531FF} 57.25}          & {\color[HTML]{3531FF} 50.87}          & {57.48}          & 9.07                                  & 13.49                                 & 3.77                                  & 16.15                                 & 15.35                                 & 16.33                                 \\
+\multicolumn{1}{c|}{\textbf{DIVIDE}}  & \textbf{AAAI 2024}    & 57.05                                 & 50.09                                 & {\color[HTML]{3531FF} 57.75}                                 & 9.02                                  & 15.85                                 & 13.28                                 & 18.09                                 & 12.00                                 & {\color[HTML]{3531FF} 18.63}          \\ \hline
+\multicolumn{1}{c|}{\textbf{AIRMVC}} & \textbf{Ours}         & {\color[HTML]{FE0000} \textbf{58.20}} & {\color[HTML]{FE0000} \textbf{51.94}} & {\color[HTML]{FE0000} \textbf{58.20}} & {\color[HTML]{FE0000} \textbf{10.85}} & {\color[HTML]{FE0000} \textbf{19.01}} & {\color[HTML]{FE0000} \textbf{18.96}} & {\color[HTML]{FE0000} \textbf{19.90}} & {\color[HTML]{FE0000} \textbf{19.92}} & {\color[HTML]{FE0000} \textbf{19.90}} \\ \hline
+\end{tabular}}
+\label{com_res5}
+\end{table*}
+
+\item Caltech101\footnote{\url{https://data.caltech.edu/records/mzrjq-6wc02}}: The Caltech101 dataset is a widely used benchmark in machine learning and computer vision, consisting of 9,144 samples categorized into 102 distinct clusters. It is characterized by its diversity and complexity, featuring five distinct views that provide complementary information for each sample. These views typically include different feature types or representations, making it a suitable dataset for evaluating multi-view clustering and representation learning methods. Due to its rich and heterogeneous structure, Caltech101 has become a standard testbed for assessing the performance of clustering algorithms in handling multi-view and high-dimensional data.
+\end{itemize}
+
+
+\textbf{Algorithm:}
+Due to the limited space of the original paper, we present the algorithm in this part. The detailed training process is presented in Algorithm.~\ref{Algo}
+
+
+
+ % with calculating $\text{argmax}(\frac{1}{v}\sum_{v=1}^Vy^v)$
+
+
+
+
+
+
+
+\subsection{Comparative Algorithms}\label{com_methods}
+
+In this paper, we compare our AIRMVC with 11 baselines, including CoMVC~\cite{SiMVC}, SiMVC~\cite{SiMVC}, MFLVC~\cite{MFLVC}, DealMVC~\cite{DealMVC}, SURE~\cite{SURE}, CANDY~\cite{candy}, TGM-MVC~\cite{TGM-MVC}, SCE-MVC~\cite{SCE-MVC} RMCNC~\cite{sun2024robust}, and  MVCAN~\cite{MVCAN}. We list the specific information of those methods as follows:
+
+\begin{itemize}
+
+\item CoMVC \& SiMVC~\cite{SiMVC}: CoMVC and SiMVC are deep multi-view clustering methods that avoid aligning all representations simultaneously. These methods incorporate a contrastive learning strategy to enhance clustering performance.
+
+\item MFLVC~\cite{MFLVC}: MFLVC introduces two consistency objectives for deep multi-view clustering by employing contrastive learning strategies at both the high-level feature space and the semantic label space.
+
+\item DealMVC~\cite{DealMVC}: DealMVC proposes a dual-calibration mechanism tailored for deep multi-view clustering. Its calibration contrastive loss effectively distinguishes between similar yet distinct samples across multiple views.
+
+\item SURE~\cite{SURE}: SURE addresses challenges related to incomplete multi-view data by developing a noise-robust contrastive loss. This approach is theoretically analyzed to handle partially unaligned views and missing samples.
+
+\item CANDY~\cite{candy}: CANDY leverages inter-view similarities as context to uncover false negatives and integrates a spectral-based module for denoising correspondence in multi-view scenarios.
+
+\item TGM-MVC~\cite{TGM-MVC}: TGM-MVC employs a tree-based framework to effectively capture the heterogeneity between different views, offering a unique perspective on multi-view clustering.
+
+\item SCE-MVC~\cite{SCE-MVC}: SCE-MVC adopts game-theoretic principles and Shapley values to address multi-view clustering challenges, providing an innovative solution to enhance clustering robustness.
+
+\item RMCNC~\cite{sun2024robust}: RMCNC introduces a noise-tolerant contrastive loss, designed to mitigate the impact of misaligned pairs in multi-view clustering tasks.
+
+\item MVCAN~\cite{MVCAN}: MVCAN employs an unshared network structure and implements a two-level optimization strategy, enabling improved clustering performance in multi-view scenarios.
+
+\item DIVIDE~\cite{DIVIDE}: DIVIDE utilizes a random walk approach to progressively identify reliable data pairs, enhancing the stability and robustness of contrastive learning in multi-view clustering.
+
+    
+\end{itemize}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\end{document}
+
+
+% This document was modified from the file originally made available by
+% Pat Langley and Andrea Danyluk for ICML-2K. This version was created
+% by Iain Murray in 2018, and modified by Alexandre Bouchard in
+% 2019 and 2021 and by Csaba Szepesvari, Gang Niu and Sivan Sabato in 2022.
+% Modified again in 2023 and 2024 by Sivan Sabato and Jonathan Scarlett.
+% Previous contributors include Dan Roy, Lise Getoor and Tobias
+% Scheffer, which was slightly modified from the 2010 version by
+% Thorsten Joachims & Johannes Fuernkranz, slightly modified from the
+% 2009 version by Kiri Wagstaff and Sam Roweis's 2008 version, which is
+% slightly modified from Prasad Tadepalli's 2007 version which is a
+% lightly changed version of the previous year's version by Andrew
+% Moore, which was in turn edited from those of Kristian Kersting and
+% Codrina Lauth. Alex Smola contributed to the algorithmic style files.
